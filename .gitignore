@@ -7,23 +7,6 @@
 ./src/module-info.java
 .metadata/.log
 .metadata/version.ini
-.metadata/.plugins/org.eclipse.core.resources/.history/fd/f05320a34038001c1f8c8985262fae44
-.metadata/.plugins/org.eclipse.core.resources/.projects/.org.eclipse.egit.core.cmp/.location
-.metadata/.plugins/org.eclipse.core.resources/.projects/lezione 4_11_2021/.indexes/e4/history.index
-.metadata/.plugins/org.eclipse.core.resources/.projects/lezione 4_11_2021/org.eclipse.jdt.core/state.dat
-.metadata/.plugins/org.eclipse.core.resources/.root/2.tree
-.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
-.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.debug.ui.prefs
-.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.launching.prefs
-.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
-.metadata/.plugins/org.eclipse.jdt.core/1865797976.index
-.metadata/.plugins/org.eclipse.jdt.core/3380770884.index
-.metadata/.plugins/org.eclipse.jdt.core/savedIndexNames.txt
-.metadata/.plugins/org.eclipse.jdt.core/variablesAndContainers.dat
-.metadata/.plugins/org.eclipse.jdt.debug.ui/dialog_settings.xml
-.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml
-.metadata/.plugins/org.eclipse.m2e.logback.configuration/0.log
-.metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
 ./.project
 ./bin/module-info.class
 *module-info.java
