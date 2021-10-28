@@ -4,8 +4,7 @@
 /.metadata
 .metadata/
 .metadata
-src/
-lezione 4_11_2021/src/module-info.java
+./src/module-info.java
 .metadata/.log
 .metadata/version.ini
 .metadata/.plugins/org.eclipse.core.resources/.history/fd/f05320a34038001c1f8c8985262fae44
@@ -27,4 +26,4 @@ lezione 4_11_2021/src/module-info.java
 .metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
 ./.project
 ./bin/module-info.class
-./src/module-info.java
+*module-info.java
