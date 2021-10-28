@@ -1,3 +1,6 @@
 *.class
+*.classpath
+*.project
 .metadata/
+.metadata
 src/
