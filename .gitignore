@@ -25,6 +25,6 @@ lezione 4_11_2021/src/module-info.java
 .metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml
 .metadata/.plugins/org.eclipse.m2e.logback.configuration/0.log
 .metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
-lezione 4_11_2021/.project
-lezione 4_11_2021/bin/module-info.class
-lezione 4_11_2021/src/module-info.java
+./.project
+./bin/module-info.class
+./src/module-info.java
