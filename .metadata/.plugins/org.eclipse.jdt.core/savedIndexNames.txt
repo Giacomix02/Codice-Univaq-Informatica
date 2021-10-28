@@ -1,4 +1,0 @@
-INDEX VERSION 1.131+C:\Users\Giacomo\OneDrive - Universita' degli Studi dell'Aquila\UNIVERSITA'\LABORATORIO DI PROGRAMMAZIONE\ESERCITAZIONI\.metadata\.plugins\org.eclipse.jdt.core
-1210658807.index
-3380770884.index
-1865797976.index
