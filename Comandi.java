@@ -38,6 +38,29 @@ public class Comandi{               //il nome della classe deve essere lo stesso
 
         //_______________________________________________________________________________________________________________________________________________
 
+        //STRINGHE
+
+        String s= "parola";
+        String s1="Ciao";
+        String t;
+
+        //metodo lenght
+        Intero3 = s.length();   //restituisce in Intero3 il numeoro di caratteri nella stringa 
+
+        //metodo equals
+        YesOrNot = s1.equals(s);    //se le due stringhe sono uguali la variabile bool sarà true altrimenti false
+        //le stringe non si confrontano con l'operatore di uguaglianza (==) 
+
+        //concatenzione di stringhe
+        t=s.concat(s1);     //la stringa t conterrà le due stringhe concatenate
+        // concat non funziona per concatenare una stringa con dati di altri tipi tipo char, int ecc
+        
+        t= s +'t'; // non da errore a differenza di concat ache se i tipi sono diversi
+
+
+
+        //_______________________________________________________________________________________________________________________________________________
+
 
         //COSTANTI ==> si può fare un solo assegnamento, successivamente non possono essere cambiate
                 // ==> il nome di una costante simbolica contiene tutte lettere maiuscole. In caso di più parole nel nome, queste sono separate da un trattino basso _
