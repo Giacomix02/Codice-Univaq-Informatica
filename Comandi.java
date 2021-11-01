@@ -9,12 +9,31 @@ public class Comandi{               //il nome della classe deve essere lo stesso
         byte Intero1;          //variabile che contiene numero intero a 8 bit
         short Intero2;         //variabile che contiene numero intero a 16 bit
         int Intero3=0;         //variabile che contiene numero intero a 32 bit inizializzata con un valore
-        long Intero4;         //variabile che contiene numero intero a 64 bit 
+        long Intero4;          //variabile che contiene numero intero a 64 bit 
 
-        float Decimale1=0;     //variabile che contiene numero decimale a virgola mobile 32 bit
+        float Decimale1=0;      //variabile che contiene numero decimale a virgola mobile 32 bit
         double Decimale2=0;     //variabile che contiene numero decimale a virgola mobile con maggiore precisione 64 bit
 
         boolean YesOrNot;      //variabile che può assumero solo 2 valori: true o false
+
+        char Carattere;        //variabile che contiene un solo carattere    
+
+        //_______________________________________________________________________________________________________________________________________________
+
+        //ARRAY
+
+        int[] Intero = new int[50];  //array di lunghezza 5 contenente interi
+        char[] ACarattere = new char[50];  //array di lunghezza 5 contenente caratteri
+
+        // <tipo>[] <nome> = new <tipo>[m]
+
+        //un array è composto da un insieme di m variabili
+        //l'indice dell'array va da 0 a m-1
+
+
+        //per sapere la lungezza di un array di usa <nome array>.lenght
+
+        Intero3=ACarattere.length;      //nella variabile Intero3 viene inserita la lunghezza dell'array 
 
 
         //_______________________________________________________________________________________________________________________________________________
@@ -63,6 +82,78 @@ public class Comandi{               //il nome della classe deve essere lo stesso
 
         //_______________________________________________________________________________________________________________________________________________
 
+        //OPERATORI RELAZIONARI 
+
+        /*
+         > (maggiore di),
+         < (minore di)
+         >= (maggiore o uguale)
+         <= (minore o uguale)
+         == (uguale a)
+         != (diverso da)
+         
+        */
+
+
+        //_______________________________________________________________________________________________________________________________________________
+
+        
+        //COSTRUTTO ITERATIVO
+
+        //ciclo WHILE
+        /*
+        while(condizione) {
+            istruzioni
+        }
+
+        */
+        while(YesOrNot==true) {   //nella condizione possiamo controllare qualsiasi variabile
+            //codice da eseguire
+        }
+
+
+        //***********
+
+        //ciclo FOR
+        /*
+         for(inizilizzazione,condizione,incremento){
+
+            istruzioni
+         }
+
+        */
+
+        for(int i; Intero3<10; i++){    //il ciclo continuerà ad iterare finchè la variabile Intero3 è minore di 10  
+
+            Intero3++;
+            //oppore altro codice
+
+        }
+
+
+        //***********
+
+
+        //ciclo do-while
+
+
+        /*
+
+            do{
+
+                istruzioni
+
+            }while(condizione)
+
+
+            il ciclo avviene per forza una volta e il controllo avviene alla fine dove  presente il while
+
+        */
+
+
+        //_______________________________________________________________________________________________________________________________________________
+
+        
 
 
         //CONVERSIONI DI TIPO
