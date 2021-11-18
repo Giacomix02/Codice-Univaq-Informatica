@@ -15,6 +15,8 @@ public class Lezione2Es2 {
 			System.out.println("x while >>" + y);
 			x++;
 			y++;
+
+
 		}
 
 	}
