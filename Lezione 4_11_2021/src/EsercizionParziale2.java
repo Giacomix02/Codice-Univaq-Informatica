@@ -1,5 +1,5 @@
 	b= {"acd","b","","gffyg","kr"}
-	a= {"acd","b","","gffyg","kr"}
+	a= {"acd","b","","gffyg","kr"}    
 //PARTE 1
 /*
 	//svolgimento 
