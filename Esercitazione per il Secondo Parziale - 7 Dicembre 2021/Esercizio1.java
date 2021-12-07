@@ -1,4 +1,3 @@
-package EserciziParziale;
 
 /*
 Esercizio 1)
@@ -25,7 +24,7 @@ Output:
 
 
 
-public class Main {
+public class esercizio1 {
     public static void main(String[] args){
         int[][]  a = {
             {3,-2,7,4,1,5},
@@ -58,11 +57,4 @@ public class Main {
 
 
 }
-
-
-
-
-    /* 
-    
-    */
 
