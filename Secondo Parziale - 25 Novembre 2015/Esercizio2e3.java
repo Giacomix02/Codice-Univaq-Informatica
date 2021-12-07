@@ -18,6 +18,7 @@ public class Esercizio2e3 {
 
     }
     
+        // I T E R A Z I O N E 
     public static String separaCaratteri(String s,char c){
 
         String s1="";
@@ -29,6 +30,8 @@ public class Esercizio2e3 {
 
         return s1;
     }
+
+        // R I C O R S I O N E 
 
     public static String separaCaratteriRicorsivo(String s,char c){     //metodo di base
         String s1="";
