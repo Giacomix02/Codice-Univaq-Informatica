@@ -47,7 +47,7 @@ public class Esercizio2e3 {
 
         String[] c = new String[a.length];
 
-        for (int i = 0; i < c.length; i++) { // "tolgo" il null dal array ci butto dentro ua stringa vuota
+        for (int i = 0; i < c.length; i++) { // "tolgo" il null dall'array e ad ogni posizione ci butto dentro una stringa vuota
             c[i] = "";
         }
 
