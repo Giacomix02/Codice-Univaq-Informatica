@@ -117,7 +117,7 @@ public class Esercizio2e3 {
 
         if (conta == k) {
 
-            if (conta < k)   c[i] = ""; // se non ho abbastanza stringhe uso stringa vuota
+
             System.out.print("  \t\tsono entrato in==>  if (conta == k)  \n");
 
             i++;
