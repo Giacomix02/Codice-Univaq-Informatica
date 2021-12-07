@@ -18,7 +18,7 @@ public class Esercizio1 {
 
         out = SommaAdiacenti(a,r,k);
 
-        System.out.println("RISULTATI:");   //da non mettere durante il compito
+        System.out.println("RISULTATI:");   //da non mettere durante il compito (vieni inculato)
         for(int i=0;i<out.length;i++){
             System.out.println("\t-->"+out[i]);
         }
