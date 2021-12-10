@@ -19,14 +19,16 @@ public class Esercizio2e3 {
        // System.out.println("a: {3,-1,5,4,-9,14}");
        // System.out.println("b: {7,2,-5}");
 
-        c=unione(a,b);
+        c=unione(a,b);  //chiamata metodo
         for(int i=0;i<c.length;i++){
             System.out.print(" "+c[i]);
         }
     }
 
     public static int[] unione(int[] a, int[] b){
+
         int[] c = new int[a.length+b.length];
+
         int contaA=0,contaB=0, minore;
 
         if(a.length<b.length) minore=a.length;  //la variabile minore è il valore della lunghezza dell'array più corto 
@@ -34,7 +36,7 @@ public class Esercizio2e3 {
 
         //System.out.println(c.length);
 
-        for (int i = 0; i < (a.length + b.length); i++) {
+        for (int i = 0; i < c.length; i++) {
             if (i < minore * 2) {   //il minore*2 perchè deve fare 2 cicli per avanzare di una posizione nei 2 array
                 if (i % 2 == 0) {
                     c[i] = a[contaA];
