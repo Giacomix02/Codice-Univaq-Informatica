@@ -1,12 +1,5 @@
 *.class
 *.classpath
 *.project
-/.metadata
-.metadata/
-.metadata
-./src/module-info.java
-.metadata/.log
-.metadata/version.ini
-./.project
-./bin/module-info.class
-*module-info.java
+*.metadata
+*.metadata/*
