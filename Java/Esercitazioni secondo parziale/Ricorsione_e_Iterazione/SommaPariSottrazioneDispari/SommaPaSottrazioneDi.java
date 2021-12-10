@@ -1,4 +1,4 @@
-public class SommaPariSottrazioneDispariRicorsivo {
+public class SommaPaSottrazioneDi {
     public static void main(String[] args) {
 
         /*
