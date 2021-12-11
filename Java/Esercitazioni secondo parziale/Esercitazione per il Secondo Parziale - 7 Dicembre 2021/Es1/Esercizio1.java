@@ -22,32 +22,36 @@ Output:
     {true,true,false}
 */
 
-
-
 public class Esercizio1 {
-    public static void main(String[] args){
-        int[][]  a = {
-            {3,-2,7,4,1,5},
-            {4,1,3,-1},
-            {3,5,-2}
+    public static void main(String[] args) {
+        int[][] a = {
+                { 3, -2, 7, 4, 1, 5 },
+                { 4, 1, 3, -1 },
+                { 3, 5, -2 }
         };
-        int[] v = {5,2,7};
-        boolean[] output = esercizio1(a, v);
+        int[] v = { 5, 2, 7 };
+        boolean[] output;
+        output = esercizio1(a, v);
+
+        output = esercizio1Ricorsivo(a,v);
+
     }
-    /* 
-        Con j = 1 e length normale
-            [j-1, j]
-                        
-        Con j = 0 e length -1
-            [j, j+1]
-    */
-    public static boolean[] esercizio1(int[][] a, int[] v){
+
+    /*
+     * Con j = 1 e length normale
+     * [j-1, j]
+     * 
+     * Con j = 0 e length -1
+     * [j, j+1]
+     */
+    public static boolean[] esercizio1(int[][] a, int[] v) {
         boolean[] b = new boolean[a.length];
-        for(int i = 0; i< a.length; i++){ //scorre le righe
+        for (int i = 0; i < a.length; i++) { // scorre le righe
             boolean trovato = false;
-            for(int j = 1; j < a[i].length && !trovato; j++){ //scorre le colonne
-                int somma = a[i][j-1] + a[i][j];
-                if(somma == v[i]) trovato = true;
+            for (int j = 1; j < a[i].length && !trovato; j++) { // scorre le colonne
+                int somma = a[i][j - 1] + a[i][j];
+                if (somma == v[i])
+                    trovato = true;
             }
             b[i] = trovato;
             System.out.println(trovato);
@@ -55,6 +59,24 @@ public class Esercizio1 {
         return b;
     }
 
+    public static boolean[] esercizio1Ricorsivo(int[][] a, int[] v){
+        boolean[] b = new boolean[a.length];
+        boolean trovato=false;
+        int somma=0;
+        return esercizio1Ricorsivo(a, v, b, 0, 0, trovato,somma);
+    }
+
+    public static boolean[] esercizio1Ricorsivo(int[][] a,int[] v,boolean[] b, int i, int j, boolean trovato, int somma){
+        if(i>=a.length) return b;
+        if(j==0) trovato=false;
+        if(j>=a.length || trovato){
+            b[i]=trovato;
+            return esercizio1Ricorsivo(a, v, b, i+1, 0, trovato, 0);
+        }
+        somma=a[i][j-1]+a[i][j];
+        if (somma == v[i]) trovato = true;
+        return esercizio1Ricorsivo(a, v, b, i, j+1, trovato, somma);
+
+    }
 
 }
-
