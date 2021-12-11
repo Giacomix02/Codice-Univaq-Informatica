@@ -59,6 +59,9 @@ public class Esercizio1 {
         return b;
     }
 
+
+    // I T E R A Z I O N E (potrebbe non funzionare, non è stato compilato e rannato)
+
     public static boolean[] esercizio1Ricorsivo(int[][] a, int[] v){
         boolean[] b = new boolean[a.length];
         boolean trovato=false;
