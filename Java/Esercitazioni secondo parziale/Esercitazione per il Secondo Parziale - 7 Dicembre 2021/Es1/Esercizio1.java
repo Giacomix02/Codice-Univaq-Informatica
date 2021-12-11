@@ -31,9 +31,15 @@ public class Esercizio1 {
         };
         int[] v = { 5, 2, 7 };
         boolean[] output;
+
+        System.out.println("METODO ITERATIVO:");
         output = esercizio1(a, v);
 
+        System.out.println("\nMETODO RICORSIVO:");
         output = esercizio1Ricorsivo(a,v);
+        for(int i=0;i<output.length;i++){
+            System.out.println(output[i]);
+        }
 
     }
 
@@ -66,16 +72,17 @@ public class Esercizio1 {
         boolean[] b = new boolean[a.length];
         boolean trovato=false;
         int somma=0;
-        return esercizio1Ricorsivo(a, v, b, 0, 0, trovato,somma);
+        return esercizio1Ricorsivo(a, v, b, 0, 1, trovato,somma);
     }
 
     public static boolean[] esercizio1Ricorsivo(int[][] a,int[] v,boolean[] b, int i, int j, boolean trovato, int somma){
         if(i>=a.length) return b;
-        if(j==0) trovato=false;
-        if(j>=a.length || trovato){
+
+        if(j>=a[i].length || trovato){
             b[i]=trovato;
-            return esercizio1Ricorsivo(a, v, b, i+1, 0, trovato, 0);
+            return esercizio1Ricorsivo(a, v, b, i+1, 1, false, 0);
         }
+
         somma=a[i][j-1]+a[i][j];
         if (somma == v[i]) trovato = true;
         return esercizio1Ricorsivo(a, v, b, i, j+1, trovato, somma);
