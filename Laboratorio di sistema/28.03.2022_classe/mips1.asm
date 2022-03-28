@@ -19,3 +19,5 @@ sub $s3,$s2,$t2
 
 sub $t3,$t1,$s3	   
 sub $s1,$s1,$t3
+
+#a e t general porpuse 
