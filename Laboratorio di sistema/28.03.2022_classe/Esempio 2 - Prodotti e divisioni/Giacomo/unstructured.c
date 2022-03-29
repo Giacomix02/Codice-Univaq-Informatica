@@ -18,7 +18,7 @@ int main(void){
 // part 2: computes reminder
 
 	s3 = s5 % 5;
-
+	
 // part 3: computes both quotient and reminder of a product
 	s2 = s2 * 52;
 	s1 = s2 / s3;

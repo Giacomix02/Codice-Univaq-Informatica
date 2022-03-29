@@ -75,6 +75,37 @@ x = t1 + t2;
 /*
     >> Comportamento che C standard non definisce nel modo più assoluto
 
+    >> Quando abbiamo un' Undefined Behavior?
+        >> [Regola Un-D-SE] 
+            >>se una variabile è affetta da side effect
+                >> E non viene eseguita interamente all'inizio o alla fine delle altre espressioni
+                >> OPPURE in altre espressioni viene usata questa variabile
+            >> esempio che rappresenta entrambi i casi : z = ( ++x - b ) * ( x -= 3 )
+
+    >> Espressioni non contenute in espressioni piu' grandi
+        >>[Regola Comp-SE-E]
+            >> Nella valutazione di un’espressione E che non e' sotto-espressionedi un’espressione piu' grande, 
+               tutti i side effect generati dallesotto-espressioni, terminano prima che termini la valutazione di E
+    
+    >> Side effects all'interno di argomenti di una funzione
+        >>[Regola Comp-SE-F1]
+            >> Tutti i side effect generati dalla valutazione degli argomenti in una chiamata di funzione,
+               terminano prima che inizi la chiamata di funzione
+    
+    >> Funzione dentro funzione con side effect 
+        >>[Regola Comp-SE-F2]  ==> non-portable unspecified behavior
+            >> Sia f1 una funzione nel cui corpo compare una chiamata adun’altra funzionef2.
+               Tutti i side effect eseguiti in f1 e tutte le valutazioni di espressioni eseguite in f1,
+               diverse dalla chiamata di f2, vengono eseguiti interamente prima dell’inizio
+               o dopo del termine dell’esecuzione del corpo di f2
+    
+    >> Side effects all'interno delle funzioni
+        >>[Regola Comp-SE-F3]
+            >> Tutti i side effect generati da espressioni contenute in una funzione, 
+               terminano prima che termini l’esecuzione della funzione
+            
+
+
 
 
 
@@ -95,6 +126,10 @@ x = t1 + t2;
         
         >> ++x
             >> prima aumenta di 1 e poi restituisce il valore della variabile
+    
+    >> Stesse regole valgono per --x e x-- 
+    >> Atri tipi di side effect si ottengono nelle assegngazioni all'interno delle espressioni
+        ad esempio quando abbiamo x+= <variabile o numero> e operazioni simili
 */
 // Esempi:
 
@@ -118,7 +153,6 @@ x = t1 + t2;
             >> La x è presente in entrambe le parentesi
                 >> Il risultato può cambiare a differenza dell'ordine di esecuzione
                     delle parantesi 
-
 
     */
 
