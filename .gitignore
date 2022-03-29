@@ -4,3 +4,5 @@
 *.metadata
 *.metadata/*
 *.exe
+*.L68
+*.S68

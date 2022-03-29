@@ -1,3 +1,5 @@
+ORG $2000
+START:
 move.l #4095, d1
 move #41, d2
 move #33, d3
@@ -20,3 +22,8 @@ divs d3, d6
 move.w d6, d1
 swap d6
 move.w d6, d2
+END    START 
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
