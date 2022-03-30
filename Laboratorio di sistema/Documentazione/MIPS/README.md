@@ -26,10 +26,9 @@
 [Assegnazione di lo](#mtlo)
 
 # Introduzione
-In MIPS i registri sono in due formati, `half` o `word`.
->word è di lunghezza 32bit
-
->half è di lunghezza 16bit
+In MIPS i registri sono in due formati:
+* `word` 32bit
+* `half` 16bit
 
 Possono essere visti come due gruppi da 16 bit, le due half formano una word
 ```
