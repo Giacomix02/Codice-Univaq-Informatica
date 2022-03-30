@@ -125,7 +125,7 @@ divs #11, d0
 ; d0 = d0/11, cioé 100/11 
 ```
 al termine dell'esecuzione del codice il registro `d0` sarà composto dai seguenti bit (in formato esadecimale):
->[`0001` `0009`]
+>[`00010009`]
 
 dove `0001` è il resto, mentre `0009` è il risultato
 
