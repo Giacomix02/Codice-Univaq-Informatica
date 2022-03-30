@@ -39,7 +39,7 @@ Possono essere visti come due gruppi da 16 bit, le due half formano una word
 Gli operatori come addizione etc possono funzionare sia a 2 operatori che 3 operatori.
 
 I register general purpose sono:
-```mips
+```assembly
 a0,a1,a2,a3
 t0,t1,t2,t3,t4,t5,t6,t7,t8,t9
 s0,s1,s2,s3,s4,s5,s6,s7
@@ -57,7 +57,7 @@ lo //lower
 ```
 
 In tutti i comandi in MIPS, l'operando a sinistra è quello che **riceve** il dato, come in C
-```mips
+```assembly
 li $s0, 100
 ;equivalente a: 
 ; s0 = 100
@@ -65,7 +65,7 @@ li $s0, 100
 
 
 Mentre invece i numeri possono essere inseriti direttamente
-```mips
+```assembly
 li $s3,826
 ```
 # Tipi di valori
@@ -78,7 +78,7 @@ li $s3,826
 *Load Immediate*
 
 Serve a settare il valore di un registro con un valore immediato (es: numerico), il primo sarà quello dove verrà settato il valore, il secondo, il valore da settare
-```mips
+```assembly
 li <destinazione>, <numero>
 li $s0, 100
 ; s0 = 100
@@ -87,7 +87,7 @@ li $s0, 100
 
 ## move
 Serve a settare il valore di un registro con il valore di un altro registro. Il primo sarà il registro da settare, il secondo invece è dove verrà preso il valore
-```mips
+```assembly
 move <destinazione>, <registro>
 move $s0, $t0
 ; s0 = t0
@@ -97,7 +97,7 @@ move $s0, $t0
 Somma il secondo e terzo operatore e mette il risultato nel primo
 
 Solo il terzo operatore può essere un numero
-```mips
+```assembly
 add <destinazione>, <registro>, <registro/numero>
 add $s0, $t1, 100
 ; setta a s0 la somma di t1 + 100
@@ -115,7 +115,7 @@ add $s0, 100, 200
 Fa la sottrazione
  tra secondo e terzo operando, mettendo il risultato nel primo
 
-```mips
+```assembly
 sub <destinazione>, <registro>, <registro/numero> 
 
 sub $s0, $t1, $t2
@@ -126,13 +126,13 @@ sub $s0, $t1, 100
 ```
 **ATTENZIONE**
 Il secondo operando deve **sempre** essere un registro, non può essere un numero:
-```mips
+```assembly
 NON VALIDO:
 sub $s1, 100, $t2
 ;s1 = 100 - $t2
 ```
 Per fare questa cosa, dovremmo caricare il `100` in un registro
-```mips
+```assembly
 li $t1, 100
 sub $s1, $t1, $t2
 ; t1 = 100
@@ -145,7 +145,7 @@ Effettua la divisione intera tra secondo operando (dividendo) e terzo operando (
 
 **NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), ciò significa che non viene restituito alcun tipo di resto da alcuna parte, né in `hi` né nello stesso registro di destinazione (come avviene su M68K), per avere il resto usare `div` [due operandi](#div-due-operandi)
 
-```mips
+```assembly
 div <destinazione>, <registro>, <registro/numero>
 
 div $a1, $t1, $t2
@@ -165,7 +165,7 @@ I registro `lo` e `hi` non possono essere letti direttamente ma vanno usati con 
     
 **ATTENZIONE**
 Il dividendo e divisore **DEVONO** essere dei registri
-```mips
+```assembly
 div <dividendo>, <divisore>
     
 div $s0, $t1 
@@ -184,7 +184,7 @@ Effettua la moltiplicazione. Il risultato sarà salvato nel registro destinazion
 
 **ATTENZIONE** Il risultato sarà espresso massimo in 32 bit, per la versione a 64 bit guarda [mult](#mult)
 
-```mips
+```assembly
 mul <destinazione>, <registro>, <registro/numero>
 
 mul $s0, $t0, $t1
@@ -195,7 +195,7 @@ mul $s0, $to, 100
 
 ## mult (due operandi)
 Effettua la moltiplicazione tra due registri, salva le prime 32 cifre in `lo`, e le restanti 32 in `hi`
-```mips
+```assembly
 mult <registro>,<registro>
 
 mult $s0, $t0
@@ -207,7 +207,7 @@ mult $s0, $t0
 *Move From `hi`*
 
 Setta nel registro indicato il valore di `hi`
-```mips
+```assembly
 mfhi <destinazione>
 
 mfhi $s0
@@ -219,7 +219,7 @@ mfhi $s0
 *Move From `lo`*
 
 Setta nel registro indicato il valore di `lo`
-```mips
+```assembly
 mflo <destinazione>
 
 mflo $s0
@@ -231,7 +231,7 @@ mflo $s0
 *Move To `hi`*
 
 Setta nel registro `hi` il valore del registro
-```mips
+```assembly
 mthi <registro/numero>
 
 mfhi $s0
@@ -244,7 +244,7 @@ mfhi 50
 *Move To `lo`*
 
 Setta nel registro `lo` il valore del registro
-```mips
+```assembly
 mtlo <registro/numero>
 
 mflo $s0
