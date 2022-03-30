@@ -178,7 +178,7 @@ clr d0
 
 ## exg 
 Scambia il contenuto di due registri, **ATTENZIONE**, funziona solo con 32 bit
-```
+```assembly
 ;prima: d0 = 0x12940000
 ;prima: d1 = 0x00000010
 exg d0,d1
