@@ -40,7 +40,9 @@ d0,d1,d2,d3,d4,d5,d6,d7
 a0,a1,a2,a3,a4,a5,a6,a7
 ```
 gli altri sono speciali, come registro 0 dove sono contenuti solo zeri, il registro 1 e 31 etc...
+
 **ATTENZIONE**, i registri a, sono di tipo address, non supportano le operazioni aritmetiche
+
 I valori numerici in formato **decimale** sono rappresentati aggiungendo un `#` prima del numero, mentre il registro è scritto direttamente
 ```assembly
 add #22,d6
@@ -56,7 +58,7 @@ move #%10110, d0
 
 # Comandi
 
-**ATTENZIONE** In alcuni dei comandi possiamo scegliere quale parte dei registri utilizzare, se solo i primi 8 bit, i primi 16 bit o tutti e 32 bit, facciamo ciò aggiungendo uno di questi 3 dopo il comando:
+**ATTENZIONE** In alcuni dei comandi possiamo scegliere quale parte dei registri utilizzare, se solo i primi 8 bit, i primi 16 bit o tutti e 32 bit, facciamo ciò aggiungendo uno di questi 3 suffissi dopo il comando:
 
 `.l` indica il formato long
 
@@ -115,7 +117,7 @@ sub d7, d0
 ## divs
 Divide il secondo registro per il primo numero/registro, salva il risultato nel secondo registro.
 
-**ATTENZIONE** salva il risultato della divisone nei primi 16 bit del secondo registro, il resto negli ultimi 16 bit. Se si vuole accedere al resto, usare il comando [swap](#swap)
+**ATTENZIONE** salva il risultato della divisione nei primi 16 bit del secondo registro, il resto negli ultimi 16 bit. Se si vuole accedere al resto, usare il comando [swap](#swap)
 ```assembly
 divs <numero/registro>, <destinazione>
 
@@ -133,7 +135,7 @@ dove 000000000000000`1` è il resto, mentre 000000000000`1001` è il risultato
 
 per ottenere il risultato serve copiare il registro in formato word, copiando solo i **primi 16 bit** di esso
 
-per ottenere il resto serve eseguire `swap` sul registro, e poi ripetere quanto detto sopra:
+per ottenere il resto serve eseguire [swap](#swap) sul registro, e poi ripetere quanto detto sopra:
 ```assembly
 move.w d0, d1
 ; d1 = d0/11
