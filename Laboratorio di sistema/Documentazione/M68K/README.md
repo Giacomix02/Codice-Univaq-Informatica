@@ -124,10 +124,12 @@ move #100, d0
 divs #11, d0
 ; d0 = d0/11, cioé 100/11 
 ```
-al termine dell'esecuzione del codice il registro `d0` sarà composto dai seguenti bit (in formato esadecimale):
->[`00010009`]
+al termine dell'esecuzione del codice il registro `d0` sarà composto dai seguenti bit:
+>[000000000000000`1`000000000000`1001`]
 
-dove `0001` è il resto, mentre `0009` è il risultato
+dove 000000000000000`1` è il resto, mentre 000000000000`1001` è il risultato
+
+(infatti 1001 in binario è 9, quindi 100/11, mentre 1 è il resto, 100-11*9)
 
 per ottenere il risultato serve copiare il registro in formato word, copiando solo i **primi 16 bit** di esso
 
