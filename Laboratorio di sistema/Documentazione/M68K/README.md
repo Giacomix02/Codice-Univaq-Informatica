@@ -93,7 +93,7 @@ Effettua la somma di due valori e salva il risultato nel secondo
 add <numero/registro>, <destinazione>
 
 add #100, d0
-; d7 = d7 + 100
+; d0 = d0 + 100
 add d7, d0
 ; d0 = d0 + d7
 ```
