@@ -13,17 +13,17 @@ int main(void){
 // part 1: computes two quotients and a product
 
 	d4 = 29041 / d0;	//fatto
-	d3 = d4 * d2;	//fatto
-	d2 = d2 + 113;	//fatto
+	d3 = d4 * d2;		//fatto
+	d2 = d2 + 113;		//fatto
 	d4 = d2 / 3;	//fatto
 
 // part 2: computes reminder
 
-	d2 = d4 % 5;	//fatto
+	d2 = d4 % 5;
 	
 // part 3: computes both quotient and reminder of a product
-	d1 = d1 * 52;	//fatto
-	d0 = d1 / d2;	//fatto
+	d1 = d1 * 52;
+	d0 = d1 / d2;
 	d1 = d1 % d2;
 
 }
