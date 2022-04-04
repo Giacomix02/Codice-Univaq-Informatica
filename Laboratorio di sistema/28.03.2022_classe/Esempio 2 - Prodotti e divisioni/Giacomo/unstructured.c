@@ -1,28 +1,30 @@
 #include <stdio.h>
 
-int s1 = 4095;
-int s2 = 41;
-int s3 = 33;
-int s4;
-int s5;
+// variabili cambiate per m68k
+
+int d0 = 4095;
+int d1 = 41;
+int d2 = 33;
+int d3;
+int d4;
 
 int main(void){
 
 // part 1: computes two quotients and a product
 
-	s5 = 29041 / s1;
-	s4 = s5 * s3;
-	s3 = s3 + 113;
-	s5 = s3 / 3;
+	d4 = 29041 / d0;	//fatto
+	d3 = d4 * d2;	//fatto
+	d2 = d2 + 113;	//fatto
+	d4 = d2 / 3;	//fatto
 
 // part 2: computes reminder
 
-	s3 = s5 % 5;
+	d2 = d4 % 5;	//fatto
 	
 // part 3: computes both quotient and reminder of a product
-	s2 = s2 * 52;
-	s1 = s2 / s3;
-	s2 = s2 % s3;
+	d1 = d1 * 52;	//fatto
+	d0 = d1 / d2;	//fatto
+	d1 = d1 % d2;
 
 }
 
@@ -42,39 +44,39 @@ int main(void){
     Original C Code
 
 	Problem statement: transform a C program in an equivalent program
-		in MIPS32-MARS and MC68000-ASM1
+		in MIPd22-MARS and MC68000-ASM1
 
 
 
 	Important point: in this example, all variables should have non-negative values
 
 
-int s1 = 4095, s2 = 41, s3 = 33, s4, s5;
+int d0 = 4095, d1 = 41, d2 = 33, d3, d4;
 
 int main( void ) {
 
 // part 1: computes two quotients and a product
-	s5 = 29041 / s1;
-	s4 = s5 * s3;
-	s3 += 113;
-	s5 = s3 / 3;
+	d4 = 29041 / d0;
+	d3 = d4 * d2;
+	d2 += 113;
+	d4 = d2 / 3;
 
 // part 2: computes reminder
-	s3 = s5 % 5;
+	d2 = d4 % 5;
 
 // part 3: computes both quotient and reminder of a product
-	s2 *= 52;
-	s1 = s2 / s3;
-	s2 = s2 % s3;
+	d1 *= 52;
+	d0 = d1 / d2;
+	d1 = d1 % d2;
 
 	return 0;
 }
 
 Final values of the variables
-s1 : 710
-s2 : 2
-s3 : 3
-s4 : 231
-s5 : 48
+d0 : 710
+d1 : 2
+d2 : 3
+d3 : 231
+d4 : 48
 
 */
