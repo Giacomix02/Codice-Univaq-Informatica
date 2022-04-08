@@ -1,32 +1,35 @@
-int t0 = -35; 
-int t1;
-int t2 = 6300;
+// nome delle variabili uguale ai registri m68k
+// usare registri formato word
+
+int d0 = -35; 
+int d1;
+int d2 = 6300;
 int main(void)
 {
-    t1 = -9153;
+    d1 = -9153;
 
-    //t2 = (--t0 - 254) + (1302 - t1);
-    int t3;
-    t0 = t0 - 1;
-    t3 = t0 - 254;
-    int t4;
-    t4 = 1302 - t1;
-    t2 = t3 + t4;
+    //d2 = (--d0 - 254) + (1302 - d1);
+    int d3;
+    d0 = d0 - 1;    //fatto
+    d3 = d0 - 254;      //fatto
+    int d4;
+    d4 = 1302 - d1;     //fatto
+    d2 = d3 + d4;       //fatto
 
-    //t0 = (t0 + 27033 - t2) - (740 - t1--) + (t2 - 14);
-    t3 = t0 + 27033;
-    t3 = t3 - t2;
+    //d0 = (d0 + 27033 - d2) - (740 - d1--) + (d2 - 14);
+    d3 = d0 + 27033;    //fatto
+    d3 = d3 - d2;       //fatto
 
-    t4 = 740 - t1;
-    t1 = t1 - 1; 
+    d4 = 740 - d1;      //fatto
+    d1 = d1 - 1;        //fatto
 
-    t0 = t3 - t4;
-    t3 = t2 - 14;
-    t0 = t0 + t3;
+    d0 = d3 - d4;       //fatto
+    d3 = d2 - 14;       //fatto
+    d0 = d0 + d3;    //fatto
 
     return 0;
 }
 
-// t0 = 17090
-// t1 = -9154
-// t2 = 10165
+// d0 = 17090
+// d1 = -9154
+// d2 = 10165
