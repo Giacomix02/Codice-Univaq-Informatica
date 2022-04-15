@@ -1,5 +1,5 @@
 /*
-5 diversi tipi di behavior:
+5 Diversi tipi di behavior:
     > well-defined
     > locale-specific
     > unspecified
@@ -85,7 +85,7 @@ x = t1 + t2;
     >> Espressioni non contenute in espressioni piu' grandi
         >>[Regola Comp-SE-E]
             >> Nella valutazione di un’espressione E che non e' sotto-espressionedi un’espressione piu' grande, 
-               tutti i side effect generati dallesotto-espressioni, terminano prima che termini la valutazione di E
+               tutti i side effect generati dalle sotto-espressioni, terminano prima che termini la valutazione di E
     
     >> Side effects all'interno di argomenti di una funzione
         >>[Regola Comp-SE-F1]
@@ -94,7 +94,7 @@ x = t1 + t2;
     
     >> Funzione dentro funzione con side effect 
         >>[Regola Comp-SE-F2]  ==> non-portable unspecified behavior
-            >> Sia f1 una funzione nel cui corpo compare una chiamata adun’altra funzionef2.
+            >> Sia f1 una funzione nel cui corpo compare una chiamata ad un’altra funzione f2.
                Tutti i side effect eseguiti in f1 e tutte le valutazioni di espressioni eseguite in f1,
                diverse dalla chiamata di f2, vengono eseguiti interamente prima dell’inizio
                o dopo del termine dell’esecuzione del corpo di f2
