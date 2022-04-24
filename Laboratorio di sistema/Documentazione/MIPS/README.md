@@ -1,34 +1,8 @@
-# Link rapidi
-[Tipi di valori](#tipi-di-valori)
-
-[Assegnazione diretta](#li)
-
-[Assegnazione registro](#move)
-
-[Addizione](#add)
-
-[Sottrazione](#sub)
-
-[Divisione a due operandi](#div-due-operandi)
-
-[Divisione a tre operandi](#div-tre-operandi)
-
-[Moltiplicazione a due operandi](#mult-due-operandi)
-
-[Moltiplicazione a tre operandi](#mul-tre-operandi)
-
-[Assegnazione da hi](#mfhi)
-
-[Assegnazione da lo](#mflo)
-
-[Assegnazione di hi](#mthi)
-
-[Assegnazione di lo](#mtlo)
-
 # Introduzione
-In MIPS i registri sono in due formati:
-* `word` 32bit
-* `half` 16bit
+In MIPS i registri sono in due formati, `half` o `word`.
+>word è di lunghezza 32bit
+
+>half è di lunghezza 16bit
 
 Possono essere visti come due gruppi da 16 bit, le due half formano una word
 ```
@@ -246,8 +220,147 @@ Setta nel registro `lo` il valore del registro
 ```assembly
 mtlo <registro/numero>
 
-mflo $s0
+mtlo $s0
 ;lo = s0
-mflo 50
+mtlo 50
 ;lo = 50
+```
+
+# Comandi branch e comparazione
+Questi comandi vengono usati per mettere a confronto un registro ad un altro registro, o ad un numero immediato, per poi andare nella label se la condizione è vera.
+
+## Comparazione con lo 0
+hanno sintassi del tipo:
+```
+comando <registro>, <label>
+```
+```c
+beqz //a == 0
+bnez //a != 0
+bgez //a >= 0
+bgtz //a > 0
+blez //a <= 0
+bltz // a < 0
+```
+Esempio:
+```assembly
+bgtz $s0, maggiore_zero
+```
+## Comparazione tra valori
+comparano due registri tra di loro e vanno alla label se la condizione è vera.
+Hanno sintassi del tipo:
+```
+comando <registro>, <registro>, <label>
+```
+```
+bne //a != b
+beq //a == b
+bge //a >= b
+bgt //a > b
+ble //a <= b
+blt // a < b
+```
+Esempio:
+```assembly
+beq $s1, $s2, label_uguali
+```
+## Branch incondizionato
+Utilizzato molto nei loop, il branch incondizionato esegue il salto alla label ogni volta.
+```
+b <label>
+```
+Esempio:
+```assembly
+b for_start
+```
+
+# Operazioni sui bit e logici
+Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
+
+## not, or, and, xor
+Effettua le operazioni not, or, and, zor, tra un registro e una maschera. La maschera è una sequenza di bit che specificano a quali posizioni si deve effettuare l'operazione logica. I vari operatori hanno funzioni equiparabili a:
+* AND: Prelevare i bit alle posizioni della maschera, oppure controllare se un bit è segnato ad 1 nella posizione segnata nella maschera
+* OR: Setta ad 1 i bit alle posizioni della maschera, senza modificare gli altri
+* NOT: Inverso di tutti i bit (1 diventa 0, 0 diventa 1), non usa una maschera
+* XOR: Inverso dei bit alle posizioni della maschera.
+
+l'ultimo elemento del comando sarà la maschera, (tranne nel not), il secondo elemento sarà il registro dove effettuare l'operazione
+```assembly
+not <destinazione>, <registro>
+
+or <destinazione>, <registro>, <numero/registro> 
+or <destinazione>, <numero>
+
+and <destinazione>, <registro>, <numero/registro> 
+and <destinazione>, <numero>
+
+xor <destinazione>, <registro>, <numero/registro> 
+xor <destinazione>, <numero>
+```
+esempi: 
+```assembly
+; s0 = 01100111 (maschera)
+; s1 = 11001100 
+; s2 = 11001100 
+; s3 = 11001100 
+; s4 = 11001100 
+
+not $s1, $s1
+; s1 = 00110011
+
+or $s2, $s2, $s0
+; s2 = 11101111
+
+and $s3, $s3, $s0
+; s3 = 01000100
+
+xor $s4, $s4, $s0
+; s4 = 10101011
+```
+
+-----------------------------------
+
+## sll 
+shift left logical, sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
+Uguale al comando << in C
+```assembly
+sll <destinazione>, <registro>, <registro>
+
+; s0 = 01011101 (in binario)
+; s2 = 3 (in decimale)
+sll $s0, $s0, $s2
+; s0 = 11101000
+```
+## srl 
+shift right logical, sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
+Uguale al comando >> in C (undefined behaviour)
+```assembly
+srl <destinazione>, <registro>, <registro>
+
+; s0 = 11011101 (in binario)
+; s2 = 3 (in decimale)
+srl $s0, $s0, $s2
+; s0 = 00011011
+```
+
+## sra
+shift right arithmetical, sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
+Uguale al comando >> in C (undefined behaviour) 
+```assembly
+sra <destinazione>, <registro>, <numero>
+
+; s0 = 10010111 (in binario)
+; s2 = 2 (in decimale)
+sra $s0, $s0, $s2
+; s0 = 11100101
+```
+## rol / ror
+rotate left / rotate right. Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
+```assembly
+rol <destinazione>, <registro>, <registro/numero>
+ror <destinazione>, <registro>, <registro/numero>
+
+; s0 = 01000011
+rol $s0, $s0, 2
+; s0 = 11010000
 ```
