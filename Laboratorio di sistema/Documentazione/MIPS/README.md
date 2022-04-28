@@ -250,7 +250,7 @@ bgtz $s0, maggiore_zero
 comparano due registri tra di loro e vanno alla label se la condizione è vera.
 Hanno sintassi del tipo:
 ```
-comando <registro>, <registro>, <label>
+comando <registro>, <registro/numero>, <label>
 ```
 ```
 bne //a != b

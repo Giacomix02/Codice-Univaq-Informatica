@@ -200,7 +200,7 @@ comando <label>
 * `bgt` a > b
 * `bge` a >= b
 
-## Comandi di branch speciali
+## Comandi di branch speciali (CCR)
 In oltre ci sono altri comandi di branch "speciali", molti comandi in m68k, una volta eseguiti, comparano il registro destinazione con lo 0, in oltre tengono conto anche del segno del numero, se c'è stato un overflow, etc... Queste informazioni vengono salvate nel CCR, ed oltre ai comandi di branch precedenti, come i precedenti comandi di branch, hanno sintassi: 
 ```assembly
 comando <label>
@@ -219,7 +219,27 @@ Se si vuole andare alla label senza confronti, utile nei loop.
 `assembly
 b <label>
 `
-
+## Lettura degli elementi del CCR
+Come visto prima nei branch, nel CCR troviamo varie informazioni durante l'esecuzione del codice, come per esempio se c'è stato un overflow, se un numero è maggiore, se è minore, etc... Possiamo leggere queste informazioni tramite questi comandi, se una condizione è vera, allora tutti i bit saranno settati a 1, sennò saranno settati a 0. hanno tutti sintassi:
+```assembly
+comando <destinazione>
+```
+* `SCC` se non c'è stato riporto (carry clear)
+* `SCS` se c'è stato riport (carry set)
+* `SEQ` se è uguale
+* `SGE` se è maggiore uguale (greater or equal) **SIGNED**
+* `SGT` se è maggiore (greater) **SIGNED**
+* `SLE` se è minore uguale (less or equal) **SIGNED**
+* `SLS` se è più piccolo o uguale (lower) **SIGNED**
+* `SLT` se è minore (less) **UNSIGNED**
+* `SHI` se è più grande (higher) **UNSIGNED**
+* `SMI` se è negativo
+* `SNE` se non è uguale
+* `SPL` se è positivo
+* `SVC` se non c'è stato overflow (overflow clear)
+* `SVS` se c'è stato overflow (overflow set)
+* `SF`  se è falso
+* `SF`  se è vero
 # Operazioni sui bit e logici
 Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
 
