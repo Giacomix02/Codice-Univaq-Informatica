@@ -204,7 +204,6 @@ mult $s0, $t0
 *Move From `hi`*, setta nel registro indicato il valore di `hi`
 ```assembly
 mfhi <destinazione>
-
 mfhi $s0
 ; s0 = hi
 ```
