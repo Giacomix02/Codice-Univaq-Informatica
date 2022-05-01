@@ -9,7 +9,7 @@ Possono essere visti come due gruppi da 16 bit, le due half formano una word
 [0000000000000000][0000000000000000]
 ```
 
-Gli operatori come addizione etc possono funzionare sia a 2 operatori che 3 operatori.
+Gli operatori come addizione etc possono funzionare sia a 2 operandi che 3 operandi.
 
 I register general purpose sono:
 ```assembly
@@ -48,11 +48,10 @@ li $s3,826
 # Comandi
 
 ## li
-*Load Immediate*
-
 Serve a settare il valore di un registro con un valore immediato (es: numerico), il primo sarà quello dove verrà settato il valore, il secondo, il valore da settare
 ```assembly
 li <destinazione>, <numero>
+
 li $s0, 100
 ; s0 = 100
 ```
@@ -62,16 +61,22 @@ li $s0, 100
 Serve a settare il valore di un registro con il valore di un altro registro. Il primo sarà il registro da settare, il secondo invece è dove verrà preso il valore
 ```assembly
 move <destinazione>, <registro>
+
 move $s0, $t0
 ; s0 = t0
 ```
 
-## add
-Somma il secondo e terzo operatore e mette il risultato nel primo
+## add - addu - addi - addiu
+Somma il secondo e terzo operando e mette il risultato nel primo
 
-Solo il terzo operatore può essere un numero
+* `add` somma **signed**, se il terzo operando è un numero, lo legge a 16bit
+* `addu` somma **unsigned**, se il terzo operando è un numero, lo legge a 32bit
+* `addi` somma immediate, il terzo operando è un numero, lo legge a 32 bit
+* `addiu` uguale a addiu ma **unsigned**
+Solo il terzo operando può essere un numero
 ```assembly
 add <destinazione>, <registro>, <registro/numero>
+
 add $s0, $t1, 100
 ; setta a s0 la somma di t1 + 100
 ; s0 = t1 + 100
@@ -84,7 +89,11 @@ NON VALIDO:
 add $s0, 100, 200
 ```
 
-## sub 
+## sub - subu
+
+* `sub` sottrae **signed**, se il terzo operando è un numero, lo legge a 16bit
+* `subu` sottrae **unsigned**, se il terzo operando è un numero, lo legge a 32bit
+
 Fa la sottrazione
  tra secondo e terzo operando, mettendo il risultato nel primo
 
@@ -104,7 +113,7 @@ NON VALIDO:
 sub $s1, 100, $t2
 ;s1 = 100 - $t2
 ```
-Per fare questa cosa, dovremmo caricare il `100` in un registro
+Se si vuole sottrarre un numero, dovremmo caricare il `100` in un registro
 ```assembly
 li $t1, 100
 sub $s1, $t1, $t2
@@ -112,11 +121,15 @@ sub $s1, $t1, $t2
 ; s1 = t1 - t2
 ```
 
-## div (tre operandi)        
+## div - divu (tre operandi)
+
+* `div` divide **signed**, se il terzo operando è un numero, lo legge a 32bit se positivo, 16bit se negativo
+* `divu` divide **unsigned**, se il terzo operando è un numero, lo legge a 32bit se positivo, 16bit se negativo
+
 Effettua la divisione intera tra secondo operando (dividendo) e terzo operando (divisore) mettendo il risultato nel primo operando
 
 
-**NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), ciò significa che non viene restituito alcun tipo di resto da alcuna parte, né in `hi` né nello stesso registro di destinazione (come avviene su M68K), per avere il resto usare `div` [due operandi](#div-due-operandi)
+**NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), ignora il resto, per avere il resto usare `div` [due operandi](#div-due-operandi) 
 
 ```assembly
 div <destinazione>, <registro>, <registro/numero>
@@ -129,10 +142,13 @@ div $a1, $t1, 10
 ```
 
 
-## div (due operandi)
+## div - divu (due operandi)
 Effettua la divisione intera tra il valore del primo operando (dividendo) e il valore del secondo (divisore), mettendo il risultato nei registri `hi` e `lo`.
-    
-in `lo` viene messo il quoziente, in `hi` il resto.
+
+* `div` divide **signed**
+* `divu` divide **unsigned**
+
+Viene salvato in `lo` il quoziente ed in `hi` il resto.
 
 I registro `lo` e `hi` non possono essere letti direttamente ma vanno usati con i comandi [mflo](#mflo) e [mfhi](#mfhi)
     
@@ -152,8 +168,12 @@ mfhi $t1
 ; t1 = hi
 ```
 
-## mul (tre operandi)
+## mul - mulu
 Effettua la moltiplicazione. Il risultato sarà salvato nel registro destinazione. 
+
+* `mul` moltiplica **signed**, se il terzo operando è un numero, se positivo lo legge a 32bit, 16bit se negativo
+* `mulu` moltiplica **unsigned**, se il terzo operando è un numero, se positivo lo legge a 32bit, 16bit se negativo
+
 
 **ATTENZIONE** Il risultato sarà espresso massimo in 32 bit, per la versione a 64 bit guarda [mult](#mult)
 
@@ -166,7 +186,11 @@ mul $s0, $to, 100
 ; s0 = t0 * 100
 ```
 
-## mult (due operandi)
+## mult - multu
+
+* `mult` moltiplica **signed**, lo legge a 32bit
+* `multu` moltiplica **unsigned**, lo legge a 32bit
+
 Effettua la moltiplicazione tra due registri, salva le prime 32 cifre in `lo`, e le restanti 32 in `hi`
 ```assembly
 mult <registro>,<registro>
@@ -177,9 +201,7 @@ mult $s0, $t0
 ```
 
 ## mfhi
-*Move From `hi`*
-
-Setta nel registro indicato il valore di `hi`
+*Move From `hi`*, setta nel registro indicato il valore di `hi`
 ```assembly
 mfhi <destinazione>
 
@@ -189,9 +211,7 @@ mfhi $s0
 
 
 ## mflo
-*Move From `lo`*
-
-Setta nel registro indicato il valore di `lo`
+*Move From `lo`*, setta nel registro indicato il valore di `lo`
 ```assembly
 mflo <destinazione>
 
@@ -201,9 +221,7 @@ mflo $s0
 
 
 ## mthi
-*Move To `hi`*
-
-Setta nel registro `hi` il valore del registro
+*Move To `hi`*, setta nel registro `hi` il valore del registro
 ```assembly
 mthi <registro/numero>
 
@@ -214,9 +232,7 @@ mfhi 50
 ```
 
 ## mtlo
-*Move To `lo`*
-
-Setta nel registro `lo` il valore del registro
+*Move To `lo`*, setta nel registro `lo` il valore del registro
 ```assembly
 mtlo <registro/numero>
 
@@ -364,3 +380,27 @@ ror <destinazione>, <registro>, <registro/numero>
 rol $s0, $s0, 2
 ; s0 = 11010000
 ```
+
+
+# Input e output (syscall)
+Le syscall ci permettono di comunicare con le api del sistema operativo. Un esempio sono quelle di lettura e scrittura del terminale.
+Il funzionamento generare è quello di inserire il tipo di comando che vogliamo effettuare nel registro `$v0`, ed eseguire la `syscall`.
+
+## Input numero intero
+Per effettuare l'input un numero intero (leggere da terminale) si deve settare il registro `$v0` a `5`, effettuare la syscall, e poi leggere il risultato in `$v0`
+
+```assembly
+li $v0, 5
+syscall
+move $s1, $v0
+```
+
+## Output numero intero
+Per effettuare l'output di un numero intero, si setta il registro di `$v0` a `1`, e il numeri da stampare all'interno del registro `$a0`
+
+```assembly
+li $a0, 20
+li $v0, 1
+syscall     ;stampa 20
+```
+
