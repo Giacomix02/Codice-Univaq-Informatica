@@ -51,7 +51,7 @@ move.w d7, d0
 move.b d7, d0
 ; copia i primi 8bit di d7 in d0
 ```
-## move
+## move 
 
 Copia il contenuto del primo, nel secondo
 ```assembly
@@ -224,27 +224,27 @@ Come visto prima nei branch, nel CCR troviamo varie informazioni durante l'esecu
 ```assembly
 comando <destinazione>
 ```
-* `SCC` se non c'è stato riporto (carry clear)
-* `SCS` se c'è stato riport (carry set)
-* `SEQ` se è uguale
-* `SGE` se è maggiore uguale (greater or equal) **SIGNED**
-* `SGT` se è maggiore (greater) **SIGNED**
-* `SLE` se è minore uguale (less or equal) **SIGNED**
-* `SLS` se è più piccolo o uguale (lower) **SIGNED**
-* `SLT` se è minore (less) **UNSIGNED**
-* `SHI` se è più grande (higher) **UNSIGNED**
-* `SMI` se è negativo
-* `SNE` se non è uguale
-* `SPL` se è positivo
-* `SVC` se non c'è stato overflow (overflow clear)
-* `SVS` se c'è stato overflow (overflow set)
-* `SF`  se è falso
-* `SF`  se è vero
+* `scc` se non c'è stato riporto (carry clear)
+* `scs` se c'è stato riporto (carry set)
+* `seq` se è uguale
+* `sge` se è maggiore uguale (greater or equal) **SIGNED**
+* `sgt` se è maggiore (greater) **SIGNED**
+* `sle` se è minore uguale (less or equal) **SIGNED**
+* `sls` se è più piccolo o uguale (lower) **UNSIGNED**
+* `slt` se è minore (less) **SIGNED**
+* `shi` se è più grande (higher) **UNSIGNED**
+* `smi` se è negativo
+* `sne` se non è uguale
+* `spl` se è positivo
+* `svc` se non c'è stato overflow (overflow clear)
+* `svs` se c'è stato overflow (overflow set)
+* `sf`  se è falso
+* `st`  se è vero
 # Operazioni sui bit e logici
 Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
 
 ## not, or, and, xor
-Effettua le operazioni not, or, and, zor, tra un registro e una maschera. La maschera è una sequenza di bit che specificano a quali posizioni si deve effettuare l'operazione logica. I vari operatori hanno funzioni equiparabili a:
+Effettua le operazioni not, or, and, xor, tra un registro e una maschera. La maschera è una sequenza di bit che specificano a quali posizioni si deve effettuare l'operazione logica. I vari operatori hanno funzioni equiparabili a:
 * `NOT` Inverso di tutti i bit (1 diventa 0, 0 diventa 1), non usa una maschera
 * `OR`  Setta ad 1 i bit alle posizioni della maschera, senza modificare gli altri
 * `AND` Prelevare i bit alle posizioni della maschera, oppure controllare se un bit è segnato ad 1 nella posizione segnata nella maschera
