@@ -45,20 +45,29 @@ li $s3,826
 - **Immediato**, come un numero
 - **Diretto-Registro**, il valore di un registro
 
+Tutti i comandi aritmetici leggono il contenuto dei registri in formato word (32 bit).
 # Comandi
 
 ## li
-Serve a settare il valore di un registro con un valore immediato (es: numerico), il primo sarà quello dove verrà settato il valore, il secondo, il valore da settare
+Mette nel registro destinazione il valore immediato (numero), il primo operando sarà il registro dove mettere il valore, il secondo operando, il numero da mettere.
 ```assembly
 li <destinazione>, <numero>
 
 li $s0, 100
 ; s0 = 100
 ```
+## lui
+`load upper immediate`
+Mette a 0 tutti i primi 16bit (half) del registro e poi mette nel registro destinazione il valore immediato (numero) nella seconda word.
+```assembly
+lui <destinazione>, <numero>
+lui $s0, 0xFFFF
+; s0 = 0xFFFF 0000
+```
 
 
-## move
-Serve a settare il valore di un registro con il valore di un altro registro. Il primo sarà il registro da settare, il secondo invece è dove verrà preso il valore
+## move 
+Serve a copiare il valore di un registro in un altro registro. Il primo sarà il registro dove verrà copiato il valore, il secondo invece è dove verrà preso il valore. Copia tutto il registro (word)
 ```assembly
 move <destinazione>, <registro>
 
@@ -129,7 +138,7 @@ sub $s1, $t1, $t2
 Effettua la divisione intera tra secondo operando (dividendo) e terzo operando (divisore) mettendo il risultato nel primo operando
 
 
-**NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), ignora il resto, per avere il resto usare `div` [due operandi](#div-due-operandi) 
+**NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), il resto viene perduto, per avere il resto usare `div` [due operandi](#div-due-operandi) 
 
 ```assembly
 div <destinazione>, <registro>, <registro/numero>
@@ -170,6 +179,8 @@ mfhi $t1
 
 ## mul - mulu
 Effettua la moltiplicazione. Il risultato sarà salvato nel registro destinazione. 
+I registri LO e HI assumono un contenuto indefinito
+
 
 * `mul` moltiplica **signed**, se il terzo operando è un numero, se positivo lo legge a 32bit, 16bit se negativo
 * `mulu` moltiplica **unsigned**, se il terzo operando è un numero, se positivo lo legge a 32bit, 16bit se negativo
@@ -244,49 +255,67 @@ mtlo 50
 # Comandi branch e comparazione
 Questi comandi vengono usati per mettere a confronto un registro ad un altro registro, o ad un numero immediato, per poi andare nella label se la condizione è vera.
 
+## Branch incondizionato
+Utilizzato molto nei loop, il branch incondizionato esegue il salto alla label ogni volta.
+
+Le istruzioni di salto incondizionato sono `b` e `j`
+```
+b <label>
+j <label>
+```
+Esempio:
+```assembly
+b for_start
+```
+
 ## Comparazione con lo 0
 hanno sintassi del tipo:
 ```
 comando <registro>, <label>
 ```
-```c
-beqz //a == 0
-bnez //a != 0
-bgez //a >= 0
-bgtz //a > 0
-blez //a <= 0
-bltz // a < 0
-```
+
+* `beqz` a == 0
+* `bnez` a != 0
+* `bgez` a >= 0
+* `bgtz` a > 0
+* `blez` a <= 0
+* `bltz` a < 0
+
 Esempio:
 ```assembly
 bgtz $s0, maggiore_zero
 ```
-## Comparazione tra valori
-comparano due registri tra di loro e vanno alla label se la condizione è vera.
+## Comparazione tra valori signed
+Comparano due registri tra di loro e vanno alla label se la condizione è vera.
 Hanno sintassi del tipo:
 ```
 comando <registro>, <registro/numero>, <label>
 ```
-```
-bne //a != b
-beq //a == b
-bge //a >= b
-bgt //a > b
-ble //a <= b
-blt // a < b
-```
+
+* `bne` a != b
+* `beq` a == b
+* `bge` a >= b
+* `bgt` a > b
+* `ble` a <= b
+* `blt` a < b
+
 Esempio:
 ```assembly
 beq $s1, $s2, label_uguali
 ```
-## Branch incondizionato
-Utilizzato molto nei loop, il branch incondizionato esegue il salto alla label ogni volta.
+## Comparazione tra valori unsigned
 ```
-b <label>
+comando <registro>, <registro/numero>, <label>
 ```
+
+* `bgeu` a >= b
+* `bgtu` a > b
+* `bleu` a <= b
+* `bltu` a < b
+
 Esempio:
 ```assembly
-b for_start
+bequ $s1, $s2, label_uguali
 ```
 
 # Operazioni sui bit e logici
@@ -336,7 +365,7 @@ xor $s4, $s4, $s0
 -----------------------------------
 
 ## sll 
-shift left logical, sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
+*Shift left logical*, sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 Uguale al comando << in C
 ```assembly
 sll <destinazione>, <registro>, <registro>
@@ -347,7 +376,7 @@ sll $s0, $s0, $s2
 ; s0 = 11101000
 ```
 ## srl 
-shift right logical, sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
+*Shift right logical*, sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
 Uguale al comando >> in C (undefined behaviour)
 ```assembly
 srl <destinazione>, <registro>, <registro>
@@ -359,7 +388,7 @@ srl $s0, $s0, $s2
 ```
 
 ## sra
-shift right arithmetical, sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
+*Shift right arithmetical*, sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
 Uguale al comando >> in C (undefined behaviour) 
 ```assembly
 sra <destinazione>, <registro>, <numero>
@@ -370,7 +399,7 @@ sra $s0, $s0, $s2
 ; s0 = 11100101
 ```
 ## rol / ror
-rotate left / rotate right. Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
+*Rotate left / right*. Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
 rol <destinazione>, <registro>, <registro/numero>
 ror <destinazione>, <registro>, <registro/numero>

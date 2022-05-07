@@ -6,8 +6,12 @@ In m68k i registri sono formati in 3 tipi diversi:
 
 Possono essere visti come 2 gruppi da 16 bit, le due word formano una long
 ```
-[0000000000000000][0000000000000000]
+[00000000 00000000][00000000 00000000]
 ```
+In questa documentazione utilizzeremo questi nomi per i vari tipi di indirizzamento.
+* `reg`: registro
+* `adr`: indirizzo di memoria
+* `num`: numero
 
 **ATTENZIONE** A differenza di MIPS, gli operatori come addizione etc funzionano solo a 2 registri, con il secondo operando, quello che riceve il dato.
 
@@ -19,10 +23,25 @@ a0,a1,a2,a3,a4,a5,a6,a7
 gli altri sono speciali, come registro 0 dove sono contenuti solo zeri, il registro 1 e 31 etc...
 **ATTENZIONE**, i registri a, sono di tipo address, non supportano le operazioni aritmetiche
 
+
+# Struttura di un programma
+Un programma base in M68K è strutturato:
+```
+ORG $2000
+
+START:
+
+END
+```
+Dove ORG è l'indirizzo di partenza, START è dove il programma inizierà l'esecuzione, e END è dove terminerà l'esecuzione.
+
+# Utilizzo valori numerici ed esadecimali
+
 I valori numerici in formato **decimale** sono rappresentati aggiungendo un `#` prima del numero, mentre il registro è scritto direttamente
 ```assembly
 add #22,d6
 ```
+
 per rappresentare valori in formato esadecimale si mette il prefisso `#$`, mentre per il formato binario `#%`
 ```assembly
 move #$00000016, d0 
@@ -36,11 +55,11 @@ move #%10110, d0
 
 **ATTENZIONE** In alcuni dei comandi possiamo scegliere quale parte dei registri utilizzare, se solo i primi 8 bit, i primi 16 bit o tutti e 32 bit, facciamo ciò aggiungendo uno di questi 3 dopo il comando:
 
-`.l` indica il formato long
+`.l` indica il formato long (32 bit)
 
-`.w` indica il formato word
+`.w` indica il formato word (16 bit)
 
-`.b` indica il formato byte
+`.b` indica il formato byte (8 bit)
 
 Esempio:
 ```assembly
@@ -51,22 +70,30 @@ move.w d7, d0
 move.b d7, d0
 ; copia i primi 8bit di d7 in d0
 ```
-## move 
 
-Copia il contenuto del primo, nel secondo
+### ***ATTENZIONE***
+
+In questa documentazione metteremo fra [ ] e { } le estensioni disponibili. 
+
+Se le parentesi [ ] non sono presenti, vuol dire che non abbiamo informazioni su quel comando, se abbiamo le parentesi vuote [ ] allora il comando non ha estensioni.
+
+In { } è specificata l'estensione di default
+
+## move [l w b] {w}
+
+Copia il contenuto del primo nel secondo. Se la destinazione è un registro indirizzi (a), di default usa formato long
 ```assembly
-move <numero/registro>, <destinazione>
+move <num/reg>, <destinazione>
 
 move #100, d0
 ; d0 = 100
 move d7, d0
 ; d0 = d7
 ```
-
-## add
+## add [l w b]
 Effettua la somma di due valori e salva il risultato nel secondo
 ```assembly
-add <numero/registro>, <destinazione>
+add <num/reg>, <destinazione>
 
 add #100, d0
 ; d7 = d7 + 100
@@ -74,10 +101,10 @@ add d7, d0
 ; d0 = d0 + d7
 ```
 
-## sub
+## sub [l w b]
 Effettua la sottrazione del secondo valore meno il primo e salva il risultato nel secondo 
 ```assembly
-sub <numero/registro>, <destinazione>
+sub <num/reg>, <destinazione>
 
 sub d7, d0
 ; d0 = d0 - d7
@@ -90,12 +117,15 @@ move #100, d7
 sub d7, d0
 ```
 
-## divs
-Divide il secondo registro per il primo numero/registro, salva il risultato nel secondo registro.
+## divs - divu [ ]
+* `divs` divisione **signed**
+* `divu` divisione **unsigned**
+
+Divide il secondo registro per il primo num/reg, salva il risultato nel secondo registro. Il primo operando viene letto con formato `word`, il secondo con formato `long`. 
 
 **ATTENZIONE** salva il risultato della divisone nei primi 16 bit del secondo registro, il resto negli ultimi 16 bit. Se si vuole accedere al resto, usare il comando [swap](#swap)
 ```assembly
-divs <numero/registro>, <destinazione>
+divs <num/reg>, <destinazione>
 
 move #100, d0
 ; d0 = 100
@@ -120,10 +150,14 @@ move.w d0, d2
 ```
 
 
-## muls
-Moltiplica il secondo registro per il primo valore/registro e salva il risultato nel secondo registro
+## muls - mulu [ ]
+
+* `muls` moltiplicazione **signed**
+* `mulu` moltiplicazione **unsigned**
+
+Moltiplica il secondo registro per il primo valore/registro e salva il risultato nel secondo registro. Il primo operando viene letto con formato `word`, il secondo con formato `long`. 
 ```assembly
-muls <numero/registro>, <destinazione>
+muls <num/reg>, <destinazione>
 
 muls #10,d1
 ; d1 = d1 * 10
@@ -133,20 +167,21 @@ muls d1,d2
 
 ```
 
-## swap
+
+## swap [ ]
 Inverte le due word all'interno dello stesso registro, se guardiamo il registro come se fosse `[a,b]`, diventerà `[b,a]`, utile per la divisione
 ```assembly
-swap <registro>
+swap <reg>
 
 ;prima: d0 = 0x0000FFFF
 swap d0
 ;dopo:  d0 = 0xFFFF0000
 ```
 
-## clr
+## clr [ ]
 Azzera il contenuto del registro messo dopo il comando
 ```assembly
-clr <registro>
+clr <reg>
 
 ;prima: d0 = 0x01495840
 clr d0
@@ -163,14 +198,34 @@ exg d0,d1
 ;dopo:  d0 = 0x00000010
 ;dopo:  d1 = 0x12940000
 ```
-## neg
+## neg [l w b] {w}
 Cambia il segno al valore del registro messo dopo l'operando
 ```assembly
-neg <registro>
+neg <reg>
 
 ;prima: d0 = 100 
 neg d0
 ;dopo:  d0 = -100 
+```
+## ext [l w]
+Estende un registro al formato specificato, usato per convertire un registro da byte a word (.w), o da word a long (.l). **ATTENZIONE**, il funzionamento del comando è prendere l'ultimo bit del tipo di formato che volete convertire e sostituirlo a tutti i restanti bit del nuovo formato, per esempio da byte a word, copia l'ultimo bit del byte e lo mette in tutti i restanti bit della word. 
+
+```assembly
+ext.w <reg> ;converte la parte byte nella word
+ext.l <reg> ;converte la parte word nella long
+
+
+;prima: d0 = 0xFF -> 1111 1111 (negativo, quindi copia l'1)
+ext.w d0
+;dopo: d0 = 0xFFFF -> 1111 1111 1111 1111
+
+;prima: d1 = 0x1234 -> 0001 0010 0011 0100  (positivo, quindi copia lo 0)
+ext.l d1
+;dopo: d1 = 0x00001234
+
+;prima d2 = 0xFF00 -> 1111 1111 0000 0000
+ext.w d2
+;dopo: d2 = 0x0000 -> 0000 0000 0000 0000
 ```
 
 # Comandi branch e comparazione
@@ -180,11 +235,18 @@ In m68k la comparazione e branch vengono effettuati in comandi separati. Il prim
 
 Ci sono due comandi di comparazione, quello rispetto due valori `cmp`, e quello rispetto allo zero `tst`. Questi comandi accettano l'utilizzo di `.l` `.w` `.b`
 
-```assembly
-tst <registro>
-; comparazione con 0
+Entrambi i comandi `cmp` e `tst` salvano il risultato del confronto nel `CCR`, che poi verranno utilizzati nei comandi di branch scritti sotto.
 
-cmp <registro/numero>, <registro>
+## tst [l w b] {w}
+```assembly
+tst <reg>
+; comparazione con 0
+```
+
+## cmp [l w b] {w}
+Se il secondo operando è un registro indirizzi (a) allora ha formato `long`.
+```assembly
+cmp <num/reg>, <reg>
 ; comparazione di due valori 
 ```
 ## Comandi di branch
@@ -215,9 +277,10 @@ e sono:
 
 
 ## Branch incondizionato
-Se si vuole andare alla label senza confronti, utile nei loop.
+Va direttamente alla label.
 ```assembly
-b <label>
+bra <label>
+jmp <label>
 ```
 ## Lettura degli elementi del CCR
 Come visto prima nei branch, nel CCR troviamo varie informazioni durante l'esecuzione del codice, come per esempio se c'è stato un overflow, se un numero è maggiore, se è minore, etc... Possiamo leggere queste informazioni tramite questi comandi, se una condizione è vera, allora tutti i bit saranno settati a 1, sennò saranno settati a 0. hanno tutti sintassi:
@@ -240,6 +303,8 @@ comando <destinazione>
 * `svs` se c'è stato overflow (overflow set)
 * `sf`  se è falso
 * `st`  se è vero
+
+
 # Operazioni sui bit e logici
 Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
 
@@ -252,11 +317,11 @@ Effettua le operazioni not, or, and, xor, tra un registro e una maschera. La mas
 
 il primo elemento del comando sarà la maschera, (tranne nel not), il secondo elemento sarà il registro dove effettuare l'operazione, e dove verrà salvata
 ```assembly
-not <registro>
+not <reg>
 
-or <registro/numero>, <destinazione>
-and <registro/numero>, <destinazione>
-eor <registro/numero>, <destinazione>
+or <num/reg>, <destinazione>
+and <num/reg>, <destinazione>
+eor <num/reg>, <destinazione>
 ```
 esempi:
 ```assembly
@@ -283,7 +348,7 @@ eor d0, d4
 logical shift left, sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 Uguale al comando << in C
 ```assembly
-lsl <registro/numero>, <destinazione>
+lsl <reg/num>, <destinazione>
 
 ; d0 = 01011101 (in binario)
 ; d2 = 3 (in decimale)
@@ -294,7 +359,7 @@ lsl d2, d0
 logical shift right, sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
 Uguale al comando >> in C (undefined behaviour)
 ```assembly
-lsr <registro/numero>, <destinazione>
+lsr <reg/num>, <destinazione>
 
 ; d0 = 11011101 (in binario)
 ; d2 = 3 (in decimale)
@@ -306,8 +371,8 @@ lsr d2, d0
 arithmetical shift right/left, sposta tutti i bit di di un registro di tot posizioni a destra/sinistra. Tiene conto del segno del numero. Se verso destra, i numeri aggiunti saranno uguali al numero più a sinistra, se verso sinistra, il segno verrà ignorato, ma se c'è un cambio di segno, verrà segnato sul CCR
 
 ```assembly
-asr <registro/numero>, <destinazione>
-asl <registro/numero>, <destinazione>
+asr <reg/num>, <destinazione>
+asl <reg/num>, <destinazione>
 ; d0 = 10010111 (in binario)
 ; d2 = 2 (in decimale)
 asr d2, d0
@@ -316,10 +381,38 @@ asr d2, d0
 ## rol / ror
 rotate left / rotate right. Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinistra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
-rol <registro/numero>, <destinazione>
-ror <registro/numero>, <destinazione>
+rol <reg/num>, <destinazione>
+ror <reg/num>, <destinazione>
 
 ; d0 = 01000011
 rol #2, d0
 ; d0 = 11010000
+```
+
+# Operazioni sui singoli bit
+Servono per effettuare operazioni sui singoli bit. Tutti i comandi seguenti, prima di modificare un bit, settano il CCR `equal` al valore del bit da cambiare, e poi modificano il bit. Se il secondo operando è un registro viene letto tutto il registro, se non lo è, vengono letti solo i primi 8 bit.
+
+Il primo operando è il bit da leggere, il secondo sarà dove effettuare l'operazione e salvarla. 
+## btst
+Testa il bit a posizione specificata del registro, setta la condizione del CCR `equal` al valore del bit a quella posizione, poi possiamo usare il comando `beq` per i branch. Non modifica la destinazione
+
+```assembly
+btst <num/reg>, <reg/adr>
+```
+## bclr 
+Setta a 0 il bit a posizione specificata del registro.
+```assembly
+bclr <num/reg>, <dest>
+```
+
+## bchg
+Inverte il bit a posizione specificata del registro.
+```assembly
+bchg <num/reg>, <dest>
+```
+
+## bset
+Setta ad 1 il bit a posizione specificata del registro.
+```assembly
+bset <num/reg>, <dest>
 ```
