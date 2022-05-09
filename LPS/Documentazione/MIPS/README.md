@@ -1,14 +1,20 @@
 # Introduzione
-In MIPS i registri sono in due formati, `half` o `word`.
->word è di lunghezza 32bit
-
->half è di lunghezza 16bit
+In MIPS i registri sono in due formati, `word` o `half`.
+* `word` 32bit
+* `half` 16bit
 
 Possono essere visti come due gruppi da 16 bit, le due half formano una word
 ```
 [0000000000000000][0000000000000000]
 ```
 
+
+In questa documentazione utilizzeremo questi nomi per i vari tipi di indirizzamento.
+* `reg`: registro
+* `adr`: indirizzo di memoria
+* `num`: numero
+
+# Registri
 Gli operatori come addizione etc possono funzionare sia a 2 operandi che 3 operandi.
 
 I register general purpose sono:
@@ -49,7 +55,7 @@ Tutti i comandi aritmetici leggono il contenuto dei registri in formato word (32
 # Comandi
 
 ## li
-Mette nel registro destinazione il valore immediato (numero), il primo operando sarà il registro dove mettere il valore, il secondo operando, il numero da mettere.
+*load immediate* -> Mette nel registro destinazione il valore immediato (numero), il primo operando sarà il registro dove mettere il valore, il secondo operando, il numero da mettere.
 ```assembly
 li <destinazione>, <numero>
 
@@ -57,8 +63,7 @@ li $s0, 100
 ; s0 = 100
 ```
 ## lui
-`load upper immediate`
-Mette a 0 tutti i primi 16bit (half) del registro e poi mette nel registro destinazione il valore immediato (numero) nella seconda word.
+*load upper immediate* -> Mette a 0 tutti i primi 16bit (half) del registro e poi mette nel registro destinazione il valore immediato (numero) nella seconda word.
 ```assembly
 lui <destinazione>, <numero>
 lui $s0, 0xFFFF
@@ -212,7 +217,7 @@ mult $s0, $t0
 ```
 
 ## mfhi
-*Move From `hi`*, setta nel registro indicato il valore di `hi`
+*Move From hi* -> Setta nel registro indicato il valore di `hi`
 ```assembly
 mfhi <destinazione>
 mfhi $s0
@@ -221,7 +226,7 @@ mfhi $s0
 
 
 ## mflo
-*Move From `lo`*, setta nel registro indicato il valore di `lo`
+*Move From lo* -> Setta nel registro indicato il valore di `lo`
 ```assembly
 mflo <destinazione>
 
@@ -231,7 +236,7 @@ mflo $s0
 
 
 ## mthi
-*Move To `hi`*, setta nel registro `hi` il valore del registro
+*Move To hi* -> Setta nel registro `hi` il valore del registro
 ```assembly
 mthi <registro/numero>
 
@@ -242,7 +247,7 @@ mfhi 50
 ```
 
 ## mtlo
-*Move To `lo`*, setta nel registro `lo` il valore del registro
+*Move To lo* -> Setta nel registro `lo` il valore del registro
 ```assembly
 mtlo <registro/numero>
 
@@ -274,12 +279,14 @@ hanno sintassi del tipo:
 comando <registro>, <label>
 ```
 
-* `beqz` a == 0
-* `bnez` a != 0
-* `bgez` a >= 0
-* `bgtz` a > 0
-* `blez` a <= 0
-* `bltz` a < 0
+Comando             |  Logicamente         
+:------------------:|:-------------------:
+beqz                 |      a == b            
+bnez                 |      a != b       
+bltz                 |      a < b
+blez                 |      a <= b
+bgtz                 |      a > b
+bgez                 |      a >= b   
 
 Esempio:
 ```assembly
@@ -292,12 +299,14 @@ Hanno sintassi del tipo:
 comando <registro>, <registro/numero>, <label>
 ```
 
-* `bne` a != b
-* `beq` a == b
-* `bge` a >= b
-* `bgt` a > b
-* `ble` a <= b
-* `blt` a < b
+Comando             |  Logicamente         
+:------------------:|:-------------------:
+beq                 |      a == b            
+bne                 |      a != b       
+blt                 |      a < b
+ble                 |      a <= b
+bgt                 |      a > b
+bge                 |      a >= b     
 
 Esempio:
 ```assembly
@@ -308,14 +317,17 @@ beq $s1, $s2, label_uguali
 comando <registro>, <registro/numero>, <label>
 ```
 
-* `bgeu` a >= b
-* `bgtu` a > b
-* `bleu` a <= b
-* `bltu` a < b
+
+Comando              |  Logicamente         
+:-------------------:|:-------------------:     
+bltu                 |      a < b
+bleu                 |      a <= b
+bgtu                 |      a > b
+bgeu                 |      a >= b   
 
 Esempio:
 ```assembly
-bequ $s1, $s2, label_uguali
+bltu $s1, $s2, label
 ```
 
 # Operazioni sui bit e logici
@@ -365,7 +377,7 @@ xor $s4, $s4, $s0
 -----------------------------------
 
 ## sll 
-*Shift left logical*, sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
+*Shift left logical* -> Sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 Uguale al comando << in C
 ```assembly
 sll <destinazione>, <registro>, <registro>
@@ -375,8 +387,9 @@ sll <destinazione>, <registro>, <registro>
 sll $s0, $s0, $s2
 ; s0 = 11101000
 ```
+
 ## srl 
-*Shift right logical*, sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
+*Shift right logical* -> Sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
 Uguale al comando >> in C (undefined behaviour)
 ```assembly
 srl <destinazione>, <registro>, <registro>
@@ -388,7 +401,7 @@ srl $s0, $s0, $s2
 ```
 
 ## sra
-*Shift right arithmetical*, sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
+*Shift right arithmetical* -> Sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
 Uguale al comando >> in C (undefined behaviour) 
 ```assembly
 sra <destinazione>, <registro>, <numero>
@@ -399,7 +412,7 @@ sra $s0, $s0, $s2
 ; s0 = 11100101
 ```
 ## rol / ror
-*Rotate left / right*. Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
+*Rotate left / right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
 rol <destinazione>, <registro>, <registro/numero>
 ror <destinazione>, <registro>, <registro/numero>
@@ -431,4 +444,113 @@ li $a0, 20
 li $v0, 1
 syscall     ;stampa 20
 ```
+# La memoria in MIPS
+La memoria in MIPS può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi dovranno essere tenuti in conto la lunghezza in byte dei vari formati di dati che andremo a salvare. 
 
+**ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
+
+## Formati di dato
+Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza'1`
+* `byte` : ha lunghezza 8 bit (1 parola)
+* `word` : ha lunghezza 16 bit (2 parole)
+* `long` : ha lunghezza 32 bit (4 parole)
+
+Esempio per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001.
+Importante è sapere il modo in cui la memoria viene letta/scritta. 
+
+Esistono due tipologie chiamate `little endian` e `big endian`. 
+
+In MIPS, per la lettura/scrittura im memoria viene usato il [Big endian](#Big-endian).
+
+### Little endian
+Little endian è quando i byte sono salvati da destra verso sinistra, partendo dal più significativo. Per esempio il numero `0x1234` viene salvato in memoria come `0x34 0x12`.
+
+### Big endian
+Big endian è quando i byte sono salvati da sinistra verso destra, partendo dal più significativo. Per esempio il numero `0x1234` viene salvato in memoria come `0x12 0x34`.
+
+## Utilizzo della memoria
+Per utilizzare la memoria all'interno del programma, ci basterà specificare il numero dell'indirizzo della memoria come operando, scrivendolo in maniera `$numero_indirizzo`, esempio `$2000`. Alternativamente, possiamo creare una `variabile` alias all'inizio del programma che indica a quale indirizzo fa riferimento l' alias. Facciamo ciò tramite il comando [.eqv](#.eqv)
+
+
+Su MIPS la memoria viene gestita principalmente dai comandi [lw-lh-lb](#Trasferimento-da-registro-a-memoria) e [sw-sh-sb](#Trasferimento-da-memoria-a-registro), rispettivamente per salvare in e caricare dalla memoria;
+
+## .eqv
+*equal variable* -> Crea un alias dell'indirizzo della memoria. 
+Deve essere sempre scritto prima del `.text`.
+
+Quando il programma viene assemblato, l'assembler sostituirà l'alias con l'indirizzo della memoria.
+
+
+```assembly
+.eqv <nome_variabile>, <adr>
+
+.eqv var_v, 0x10011000 
+; var_v è l'address 0x10011000
+```
+## Trasferimento da registro a memoria
+In MIPS non è possibile utilizzare gli indirizzi di memoria direttamente all'interno delle istruzioni, dovranno per forza essere salvate all'interno di un registro prima di poterle usare.
+### sw
+*Store word*-> Salva la word contenuta nel registro, nell'indirizzo specificato (32 bit, 4 byte)
+
+```assembly
+sw <reg>, <adr>
+
+; so = 1234
+sw $s0, 2000
+; salva ad address 2000 la word 1234
+```
+### sh
+*Store half*-> Salva la half contenuta nel registro, nell'indirizzo specificato (16 bit, 2 byte)
+
+```assembly
+sh <reg>, <adr>
+
+; so = 1234
+sh $s0, 2000
+; salva ad address 2000 la half 1234
+```
+### sb
+*Store byte*-> Salva il byte contenuto nel registro, nell'indirizzo specificato (8 bit, 1 byte)
+
+```assembly
+sb <reg>, <adr>
+
+; so = 200
+sh $s0, 2000
+; salva ad address 2000 il byte 200
+```
+le istruzioni store non necessitano di avere la specifica *unsigned*
+## Trasferimento da memoria a registro
+Per prelevare un dato dalla memoria e salvarlo in un registro.
+### lw
+*Load word* -> Preleva la word dall'indirizzo specificato e la salva nel registro. (32 bit, 4 byte).
+```assembly
+lw <reg>, <adr>
+
+lw $s0, 2000
+```
+
+### lh - lhu
+*Load half / load half unsigned*  -> Preleva la half dall'indirizzo specificato e la salva nel registro. (16 bit, 2 byte).
+* `lh` Setta il CCR in base al segno del numero
+* `lhu` Non setta il CCR
+```assembly
+lh <reg>, <adr>
+lhu <reg>, <adr>
+
+lh $s0, 2000
+lhu $s1, 3000
+```
+### lb - lbu
+*Load byte / load byte unsigned* -> Preleva il byte dall'indirizzo specificato e la salva nel registro. (8 bit, 1 byte).
+* `lb` Setta il CCR in base al segno del numero
+* `lbu` Non setta il CCR
+```assembly
+lb <reg>, <adr>
+lbu <reg>, <adr>
+
+lb $s0, 2000
+lbu $s1, 3000
+```
+
+ 

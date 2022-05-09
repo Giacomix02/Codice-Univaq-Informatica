@@ -452,8 +452,11 @@ bset <num/reg>, <destinazione>
 # La memoria in M68K
 La memoria in M68K può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi dovranno essere tenuti in conto la lunghezza in byte dei vari formati di dati che andremo a salvare. 
 
+
+**ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
+
 ## Formati di dato
-Questi sono i formati di dati e la loro lunghezza. Quando vogliamo, per esempio, salvare una variabile di formato che ha lunghezza di 2 byte, dobbiamo tenere conto dell'indirizzo di partenza e quello di fine, dato dall'indirizzo di partenza e la lunghezza. 
+Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza'1`
 * `byte` : ha lunghezza 8 bit (1 parola)
 * `word` : ha lunghezza 16 bit (2 parole)
 * `long` : ha lunghezza 32 bit (4 parole)
@@ -484,10 +487,10 @@ Naturalmente la lettura e scrittura dipendono dal formato di dato utilizzato.
 ## equ
 *equals* -> Il comando `equ` è usato per assegnare ad un indirizzo di memoria una variabile
 
-Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito dal compilatore e sostituito con l'indirizzo di memoria.
+Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito dall'assembler e sostituito con l'indirizzo di memoria.
 
 ```assembly
-<nome variabile>  equ  <adr> 
+<nome_variabile>  equ  <adr> 
 
 unaVariabile equ 5020
 ```
