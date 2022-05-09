@@ -1,5 +1,0 @@
-verranno accettate solo le pull che rispettano ciò che è scritto nel README
-se i file/esercizi hanno lo stesso risultato ma diversa risolzione crea una sottocartella con un nome 
-breve, se si vuole spiegare l'esercizio crea un .txt all'interno della cartella
-
-NON GARANTISCO LA CORRETTEZZA DEGLI ESERCIZI
