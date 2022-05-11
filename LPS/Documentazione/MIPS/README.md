@@ -217,7 +217,7 @@ mult $s0, $t0
 ```
 
 ## mfhi
-*Move From hi* -> Setta nel registro indicato il valore di `hi`
+*Move From hi* -> Estrae il valore di `hi` e lo inserisce nel registro
 ```assembly
 mfhi <destinazione>
 mfhi $s0
@@ -226,7 +226,7 @@ mfhi $s0
 
 
 ## mflo
-*Move From lo* -> Setta nel registro indicato il valore di `lo`
+*Move From lo* -> Estrae il valore di `lo` e lo inserisce nel registro
 ```assembly
 mflo <destinazione>
 
@@ -240,9 +240,9 @@ mflo $s0
 ```assembly
 mthi <registro/numero>
 
-mfhi $s0
+mthi $s0
 ;hi = s0
-mfhi 50
+mthi 50
 ;hi = 50
 ```
 
