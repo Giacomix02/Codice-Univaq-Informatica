@@ -91,6 +91,12 @@ move #100, d0
     ;d0 = 100
 move d7, d0
     ;d0 = d7
+move.w  $00002082,$0000208c     ; copia la word dell'address di memoria $2082 nell'address di memoria $208c
+```
+È inoltre possibile utilizzare operazioni di somma per indicare address, queste operazioni vengono fatte dal traduttore e non al momento dell'esecuzione
+
+```assembly
+move.b  $00002080+1,d1     ; copia il valore del byte dell'address di memoria $2081 in d1
 ```
 ## add [l w b]
 *addition* -> Effettua la somma di due valori e salva il risultato nel secondo
@@ -101,6 +107,7 @@ add #100, d0
     ;d7 = d7 + 100
 add d7, d0
     ;d0 = d0 + d7
+add.b   #3,$0000208c    ; somma 3 al byte dell'address di memoria $208c
 ```
 
 ## sub [l w b]
@@ -112,6 +119,7 @@ sub d7, d0
     ;d0 = d0 - d7
 sub #100, d0
     ;d0 = d0 - 100
+sub.b   #3,$0000208c    ; sottrare 3 al byte dell'address di memoria $208c
 ```
 **ATTENZIONE**, il secondo parametro deve sempre essere un registro, se vogliamo fare `100 - d0` dobbiamo caricare il `100` dentro un registro, poi fare la sottrazione
 ```assembly
@@ -133,6 +141,7 @@ move #100, d0
     ;d0 = 100
 divs #11, d0
     ;d0 = d0/11, cioé 100/11 
+divs    $00002810,d0    ; divide d0 per il valore dell'address $2810
 ```
 al termine dell'esecuzione del codice il registro `d0` sarà composto dai seguenti bit (in formato esadecimale):
 >[`00010009`]
@@ -166,6 +175,7 @@ muls #10,d1
 
 muls d1,d2
     ;d2 = d2 * d1
+muls    $00002810,d0    ; moltiplica d0 per il valore dell'address $2810
 
 ```
 
@@ -249,7 +259,7 @@ tst <reg>
 ## cmp [l w b] {w}
 *compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`.
 ```assembly
-cmp <num/reg>, <reg>
+cmp <num/reg/adr>, <reg>
     ; comparazione di due valori 
 ```
 ## Comandi di branch
@@ -455,16 +465,21 @@ La memoria in M68K può essere vista come una lista di byte, dove ogni byte nell
 
 **ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
 
-## Formati di dato
-Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza'1`
-* `byte` : ha lunghezza 8 bit (1 parola)
-* `word` : ha lunghezza 16 bit (2 parole)
-* `long` : ha lunghezza 32 bit (4 parole)
+## Formati di dato e allineamento
+Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza`.
 
-Esempio per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001.
+Alcuni formati standard, diversi dal formato **byte**, definiscono una restrizione agli indirizzi validi per le 
+parole standard di tale formato, chiamata `vincolo di allineamento`.
+
+* `byte` : ha lunghezza 8 bit (1 parola)
+* `word` : ha lunghezza 16 bit (2 parole), fattore di alleneamento 2
+* `long` : ha lunghezza 32 bit (4 parole), fattore di alleneamento 2
+
+Ad esempio, per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001 e, dunque, la successiva **word** o **long**, non potrà essere salvata a partire dall'address 0x2001 ma bensì dovrà essere salvata a partire dall'address 0x2002.
+
 Importante è sapere il modo in cui la memoria viene letta/scritta. Esistono due tipologie chiamate `little endian` e `big endian`. 
 
-In m68k, per la lettura/scrittura im memoria viene usato il [Big endian](#Big-endian).
+In m68k, per la lettura/scrittura in memoria viene usato il [Big endian](#Big-endian).
 
 ### Little endian
 Little endian è quando i byte sono salvati da destra verso sinistra, partendo dal più significativo. Per esempio il numero `0x1234` viene salvato in memoria come `0x34 0x12`.
@@ -478,12 +493,13 @@ Per utilizzare la memoria all'interno del programma, ci basterà specificare il 
 ```assembly
 unaVariabile equ $3000
 
-move.w #1234, $2000
+move.w #1234, $00002000
     ; la word 1234 viene salvata in memoria all'indirizzo 0x2000
     ; quindi viene salvato 12 all'indirizzo 0x2000 e 34 all'indirizzo 0x2001
 move.w #1234, unaVariabile
 ```
 Naturalmente la lettura e scrittura dipendono dal formato di dato utilizzato.
+
 ## equ
 *equals* -> Il comando `equ` è usato per assegnare ad un indirizzo di memoria una variabile
 
