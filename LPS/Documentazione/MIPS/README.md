@@ -450,17 +450,23 @@ La memoria in MIPS può essere vista come una lista di byte, dove ogni byte nell
 **ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
 
 ## Formati di dato
-Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza'1`
-* `byte` : ha lunghezza 8 bit (1 parola)
-* `word` : ha lunghezza 16 bit (2 parole)
-* `long` : ha lunghezza 32 bit (4 parole)
+Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza`.
 
-Esempio per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001.
+Alcuni formati standard, diversi dal formato **byte**, definiscono una restrizione agli indirizzi validi per le 
+parole standard di tale formato, chiamata `vincolo di allineamento`.
+* `byte` : ha lunghezza 8 bit (1 parola)
+* `word` : ha lunghezza 16 bit (2 parole), fattore di alleneamento 2
+* `long` : ha lunghezza 32 bit (4 parole), fattore di alleneamento 4
+
+Ad esempio, per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001 e, dunque, la successiva **word**, non potrà essere salvata a partire dall'address 0x2001 ma bensì dovrà essere salvata a partire dall'address 0x2002.
+
 Importante è sapere il modo in cui la memoria viene letta/scritta. 
 
 Esistono due tipologie chiamate `little endian` e `big endian`. 
 
-In MIPS, per la lettura/scrittura im memoria viene usato il [Big endian](#Big-endian).
+In MIPS, per la lettura/scrittura im memoria può essere usato sia il [Big endian](#Big-endian) che il [Little endian](#little-endian).
+
+MIPS32-MARS utilizza il [Little endian](#little-endian).
 
 ### Little endian
 Little endian è quando i byte sono salvati da destra verso sinistra, partendo dal più significativo. Per esempio il numero `0x1234` viene salvato in memoria come `0x34 0x12`.
