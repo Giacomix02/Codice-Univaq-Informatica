@@ -472,8 +472,8 @@ Alcuni formati standard, diversi dal formato **byte**, definiscono una restrizio
 parole standard di tale formato, chiamata `vincolo di allineamento`.
 
 * `byte` : ha lunghezza 8 bit (1 parola)
-* `word` : ha lunghezza 16 bit (2 parole), fattore di alleneamento 2
-* `long` : ha lunghezza 32 bit (4 parole), fattore di alleneamento 2
+* `word` : ha lunghezza 16 bit (2 parole), fattore di allineamento 2
+* `long` : ha lunghezza 32 bit (4 parole), fattore di allineamento 2
 
 Ad esempio, per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001 e, dunque, la successiva **word** o **long**, non potrà essere salvata a partire dall'address 0x2001 ma bensì dovrà essere salvata a partire dall'address 0x2002.
 
