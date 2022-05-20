@@ -7,13 +7,6 @@ Possono essere visti come due gruppi da 16 bit, le due half formano una word
 ```
 [0000000000000000][0000000000000000]
 ```
-
-
-In questa documentazione utilizzeremo questi nomi per i vari tipi di indirizzamento.
-* `reg`: registro
-* `adr`: indirizzo di memoria
-* `num`: numero
-
 # Registri
 Gli operatori come addizione etc possono funzionare sia a 2 operandi che 3 operandi.
 
@@ -38,8 +31,8 @@ lo //lower
 In tutti i comandi in MIPS, l'operando a sinistra è quello che **riceve** il dato, come in C
 ```assembly
 li $s0, 100
-;equivalente a: 
-; s0 = 100
+    ;equivalente a: 
+    ;s0 = 100
 ```
 
 
@@ -47,11 +40,41 @@ Mentre invece i numeri possono essere inseriti direttamente
 ```assembly
 li $s3,826
 ```
-# Tipi di valori
-- **Immediato**, come un numero
-- **Diretto-Registro**, il valore di un registro
+# Metodi di indirizzamento
+
+Si definisce *modo di indirizzamento* (*addressing mode*) una regola che, a partire da alcune informazioni, permette di indirizzare una parola.
 
 Tutti i comandi aritmetici leggono il contenuto dei registri in formato word (32 bit).
+
+In MIPS ci sono vari modi per indirizzare i dati e prenderne i valori. 
+
+## Immediato
+`Im` Un numero, non è mai destinazione di un'istruzione
+```assembly   
+Im -> <numero>
+    add	$t0, $t0, 8
+```
+
+## Diretto registro
+`An` Registro indirizzi, **NON** può essere usato in tutte le istruzioni, per esempio **NON** può essere usato per la moltiplicazione e divisone.
+```
+An -> <s0/s1/.../s7/t0/t1/.../t7>
+    add $s0, $s1, $s2
+```
+
+## Indiretto registro 
+`(An)` Si utilizza un registro indirizzi come puntatore. Legge la memoria all'indirizzo di An. Utilizzato nell'indicizzazione dinamica di un array.
+```assembly
+    lbu	$t0,($t1)
+```
+
+## Implicito
+Viene implicitamente utilizzato un registro per eseguire una particolare operazione
+```assembly
+    mfhi $s0    ; setta nel registro hi il valore del registro
+```
+
+
 # Comandi
 
 ## li
@@ -60,14 +83,14 @@ Tutti i comandi aritmetici leggono il contenuto dei registri in formato word (32
 li <destinazione>, <numero>
 
 li $s0, 100
-; s0 = 100
+    ;s0 = 100
 ```
 ## lui
 *load upper immediate* -> Mette a 0 tutti i primi 16bit (half) del registro e poi mette nel registro destinazione il valore immediato (numero) nella seconda word.
 ```assembly
 lui <destinazione>, <numero>
 lui $s0, 0xFFFF
-; s0 = 0xFFFF 0000
+    ;s0 = 0xFFFF 0000
 ```
 
 
@@ -77,7 +100,7 @@ Serve a copiare il valore di un registro in un altro registro. Il primo sarà il
 move <destinazione>, <registro>
 
 move $s0, $t0
-; s0 = t0
+    ;s0 = t0
 ```
 
 ## add - addu - addi - addiu
@@ -92,12 +115,12 @@ Solo il terzo operando può essere un numero
 add <destinazione>, <registro>, <registro/numero>
 
 add $s0, $t1, 100
-; setta a s0 la somma di t1 + 100
-; s0 = t1 + 100
+    ;setta a s0 la somma di t1 + 100
+    ;s0 = t1 + 100
 
 add $s0, $t1, $t2
-; setta a s0 la somma t1 + t2
-; s0 = t1 + t2
+    ;setta a s0 la somma t1 + t2
+    ;s0 = t1 + t2
 
 NON VALIDO:
 add $s0, 100, 200
@@ -115,24 +138,24 @@ Fa la sottrazione
 sub <destinazione>, <registro>, <registro/numero> 
 
 sub $s0, $t1, $t2
-; s0 = t1 - t2
+    ;s0 = t1 - t2
 
 sub $s0, $t1, 100
-; s0 = t1 - 100
+    ;s0 = t1 - 100
 ```
 **ATTENZIONE**
 Il secondo operando deve **sempre** essere un registro, non può essere un numero:
 ```assembly
-NON VALIDO:
+    ;NON VALIDO
 sub $s1, 100, $t2
-;s1 = 100 - $t2
+    ;s1 = 100 - $t2
 ```
 Se si vuole sottrarre un numero, dovremmo caricare il `100` in un registro
 ```assembly
 li $t1, 100
 sub $s1, $t1, $t2
-; t1 = 100
-; s1 = t1 - t2
+    ;t1 = 100
+    ;s1 = t1 - t2
 ```
 
 ## div - divu (tre operandi)
@@ -149,10 +172,10 @@ Effettua la divisione intera tra secondo operando (dividendo) e terzo operando (
 div <destinazione>, <registro>, <registro/numero>
 
 div $a1, $t1, $t2
-; a1 = t1 / t2
+    ;a1 = t1 / t2
 
 div $a1, $t1, 10
-; a1 = t1 / 10
+    ;a1 = t1 / 10
 ```
 
 
@@ -172,14 +195,14 @@ Il dividendo e divisore **DEVONO** essere dei registri
 div <dividendo>, <divisore>
     
 div $s0, $t1 
-; lo = s0 / t0
-; hi = s0 % t0
+    ;lo = s0 / t0
+    ;hi = s0 % t0
 
 mflo $s1 
-; s1 = lo
+    ;s1 = lo
 
 mfhi $t1
-; t1 = hi
+    ;t1 = hi
 ```
 
 ## mul - mulu
@@ -197,9 +220,9 @@ I registri LO e HI assumono un contenuto indefinito
 mul <destinazione>, <registro>, <registro/numero>
 
 mul $s0, $t0, $t1
-; s0 = t0 * t1
+    ;s0 = t0 * t1
 mul $s0, $to, 100
-; s0 = t0 * 100
+    ;s0 = t0 * 100
 ```
 
 ## mult - multu
@@ -212,8 +235,8 @@ Effettua la moltiplicazione tra due registri, salva le prime 32 cifre in `lo`, e
 mult <registro>,<registro>
 
 mult $s0, $t0
-; lo = primi 32 bit
-; hi = ultimi 32 bit
+    ;lo = primi 32 bit
+    ;hi = ultimi 32 bit
 ```
 
 ## mfhi
@@ -221,7 +244,7 @@ mult $s0, $t0
 ```assembly
 mfhi <destinazione>
 mfhi $s0
-; s0 = hi
+    ;s0 = hi
 ```
 
 
@@ -231,7 +254,7 @@ mfhi $s0
 mflo <destinazione>
 
 mflo $s0
-; s0 = lo
+    ;s0 = lo
 ```
 
 
@@ -241,9 +264,9 @@ mflo $s0
 mthi <registro/numero>
 
 mthi $s0
-;hi = s0
+    ;hi = s0
 mthi 50
-;hi = 50
+    ;hi = 50
 ```
 
 ## mtlo
@@ -252,9 +275,9 @@ mthi 50
 mtlo <registro/numero>
 
 mtlo $s0
-;lo = s0
+    ;lo = s0
 mtlo 50
-;lo = 50
+    ;lo = 50
 ```
 
 # Comandi branch e comparazione
@@ -355,23 +378,28 @@ xor <destinazione>, <numero>
 ```
 esempi: 
 ```assembly
-; s0 = 01100111 (maschera)
-; s1 = 11001100 
-; s2 = 11001100 
-; s3 = 11001100 
-; s4 = 11001100 
+    ;per semplicità di scrittura, sono rappresentati solo 8 dei 32 bit
+    ;s0 = 01100111
+    ;in realtà sarebbe
+    ;s0 = 00000000000000000000000001100111
+
+    ;s0 = 01100111 (maschera)
+    ;s1 = 11001100 
+    ;s2 = 11001100 
+    ;s3 = 11001100 
+    ;s4 = 11001100 
 
 not $s1, $s1
-; s1 = 00110011
+    ;s1 = 00110011
 
 or $s2, $s2, $s0
-; s2 = 11101111
+    ;s2 = 11101111
 
 and $s3, $s3, $s0
-; s3 = 01000100
+    ;s3 = 01000100
 
 xor $s4, $s4, $s0
-; s4 = 10101011
+    ;s4 = 10101011
 ```
 
 -----------------------------------
@@ -382,10 +410,10 @@ Uguale al comando << in C
 ```assembly
 sll <destinazione>, <registro>, <registro>
 
-; s0 = 01011101 (in binario)
-; s2 = 3 (in decimale)
+    ;s0 = 01011101 (in binario)
+    ;s2 = 3 (in decimale)
 sll $s0, $s0, $s2
-; s0 = 11101000
+    ;s0 = 11101000
 ```
 
 ## srl 
@@ -394,10 +422,10 @@ Uguale al comando >> in C (undefined behaviour)
 ```assembly
 srl <destinazione>, <registro>, <registro>
 
-; s0 = 11011101 (in binario)
-; s2 = 3 (in decimale)
+    ;s0 = 11011101 (in binario)
+    ;s2 = 3 (in decimale)
 srl $s0, $s0, $s2
-; s0 = 00011011
+    ;s0 = 00011011
 ```
 
 ## sra
@@ -406,10 +434,10 @@ Uguale al comando >> in C (undefined behaviour)
 ```assembly
 sra <destinazione>, <registro>, <numero>
 
-; s0 = 10010111 (in binario)
-; s2 = 2 (in decimale)
+    ;s0 = 10010111 (in binario)
+    ;s2 = 2 (in decimale)
 sra $s0, $s0, $s2
-; s0 = 11100101
+    ;s0 = 11100101
 ```
 ## rol / ror
 *Rotate left / right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
@@ -417,9 +445,9 @@ sra $s0, $s0, $s2
 rol <destinazione>, <registro>, <registro/numero>
 ror <destinazione>, <registro>, <registro/numero>
 
-; s0 = 01000011
+    ;s0 = 01000011
 rol $s0, $s0, 2
-; s0 = 11010000
+    ;s0 = 11010000
 ```
 
 
@@ -442,7 +470,8 @@ Per effettuare l'output di un numero intero, si setta il registro di `$v0` a `1`
 ```assembly
 li $a0, 20
 li $v0, 1
-syscall     ;stampa 20
+syscall     
+    ;stampa 20
 ```
 # La memoria in MIPS
 La memoria in MIPS può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi dovranno essere tenuti in conto la lunghezza in byte dei vari formati di dati che andremo a salvare. 
@@ -488,10 +517,12 @@ Quando il programma viene assemblato, l'assembler sostituirà l'alias con l'indi
 
 
 ```assembly
-.eqv <nome_variabile>, <adr>
+.eqv <nome_variabile>, <adr/reg>
 
 .eqv var_v, 0x10011000 
-; var_v è l'address 0x10011000
+    ;var_v è l'address 0x10011000
+.eqv var_w, $s0
+    ;var_w è il registro s0
 ```
 ## Trasferimento da registro a memoria
 In MIPS non è possibile utilizzare gli indirizzi di memoria direttamente all'interno delle istruzioni, dovranno per forza essere salvate all'interno di un registro prima di poterle usare.
@@ -501,9 +532,9 @@ In MIPS non è possibile utilizzare gli indirizzi di memoria direttamente all'in
 ```assembly
 sw <reg>, <adr>
 
-; so = 1234
+    ;so = 1234
 sw $s0, 2000
-; salva ad address 2000 la word 1234
+    ;salva ad address 2000 la word 1234
 ```
 ### sh
 *Store half*-> Salva la half contenuta nel registro, nell'indirizzo specificato (16 bit, 2 byte)
@@ -511,9 +542,9 @@ sw $s0, 2000
 ```assembly
 sh <reg>, <adr>
 
-; so = 1234
+    ;so = 1234
 sh $s0, 2000
-; salva ad address 2000 la half 1234
+    ;salva ad address 2000 la half 1234
 ```
 ### sb
 *Store byte*-> Salva il byte contenuto nel registro, nell'indirizzo specificato (8 bit, 1 byte)
@@ -521,9 +552,9 @@ sh $s0, 2000
 ```assembly
 sb <reg>, <adr>
 
-; so = 200
+    ;so = 200
 sh $s0, 2000
-; salva ad address 2000 il byte 200
+    ;salva ad address 2000 il byte 200
 ```
 le istruzioni store non necessitano di avere la specifica *unsigned*
 ## Trasferimento da memoria a registro
@@ -558,5 +589,102 @@ lbu <reg>, <adr>
 lb $s0, 2000
 lbu $s1, 3000
 ```
+### la 
+*Load address* -> Copia l'indirizzo della label nel registro
+```
+la <reg>, <label>
 
- 
+la $s0, unaLabel
+```
+```assembly
+# Indirizzi di Memoria e Label
+Gli indirizzi possono essere scritti in forme più comode utilizzando `label`. 
+Ogni label è legata ad un indirizzo di memoria, ovvero rappresenta tale indirizzo. In fase di traduzione l'assembler trasforma ogni label nell'indirizzo ad essa legato. Ha quindi senso operazioni come
+```assembly
+; se pippo è una label, l'indirizzo successivo sarà l'indirizzo pippo+1, quello dopo ancora pippo+2, e così via...
+
+        li  $s0, 100
+pippo:  add $s0, $t1, 100 
+        div $a1, $t1, 10    ;pippo+1
+        mul $s0, $t0, $t1   ;pippo+2
+```
+Quando il programma viene assemblato, ogni istruzione è convertita in un numero a 32 bit (4 byte). Quando il programma viene eseguito, questi numeri sono caricati nella memoria ed eseguiti. Le label sono solo un "alias" all'indirizzo di memoria dove è salvata l'istruzione. Quando per esempio facciamo un branch ad una label, quello che in realtà sta succedendo, è che il programma continua l'esecuzione all'indirizzo di memoria dove è salvata la label.
+
+# Allocazione statica della memoria
+L’allocazione della memoria statica viene fatta mediante le `sezioni`; ogni sezione ha un `indirizzo di inizio sezione`.
+
+Si può allocare la memoria in maniera "statica" (cioè non si può espandere).
+
+Una direttiva di definizione dati:
+* indica quanti byte devono essere allocati e se necessario, i valori da memorizzare.
+* non indica l’indirizzo di memoria dei byte da allocare: tale indirizzo è determinato automaticamente dall'assembler.
+
+## .data
+Per indicare la sezione della memoria in MIPS32-MARS viene utilizzata la direttiva *.data*. Tale direttiva viene seguita dalle dichiarazioni di costanti.
+```assembly
+    .data
+```
+
+## Definizione di costanti
+Per definire costanti all'interno di un programma vengono invece utilizzata le direttive:
+* ***.byte*** -> definisce una o più costanti di formato *byte*
+* ***.half*** -> definisce una o più costanti di formato *half*
+* ***.word*** -> definisce una o più costanti di formato *word*
+
+Combinando i meccanismi di direttive e etichette, si ottiene una sintassi simile al C
+```assembly
+    .data
+eta:        .byte   24      ; char eta = 24;
+voto:       .half   28      ; int voto = 28;
+score:      .word   -170     ; long int score = -170;
+```
+Nelle direttive ***.byte*** ***.half*** ***.word*** i valori possono essere espressi anche in esadecimale
+```assembly
+    .data
+.byte   0xAF
+.half   0xAB13
+.word   0xABCD0000
+```
+***ATTENZIONE*** Si noti che l'assembler MARS scrive valori secondo la endianness [Little endian](#little-endian)
+```assembly
+    .data
+.byte   0xAA 0xBB 0xCC 0xDD
+```
+è equivalente a
+```assembly
+    .data
+.word   0xDDCCBBAA
+```
+Possiamo usare i meccanismi di direttive e etichette per definire array e stringhe (di lunghezza fissa).
+
+
+Per esempio per definire un array di 5 elementi tutti a valore 1:
+```assembly
+    ; char unArray[ 5 ] = { 1, 1, 1, 1, 1 };
+    .data   $10010000
+unArray:    .byte   1,1,1,1,1
+```
+Potremmo poi accedere ai valori dell'array usando il nome della label. Se vogliamo iterare gli elementi dell'array, dovremmo leggere l'indirizzo dell'array, e poi incrementarlo in base alla grandezza degli elementi. Oppure se dobbiamo leggere un elemento specifico, possiamo usare `label+posizione`
+```assembly
+; STATICO
+    .data   $10010000
+unArray:    .byte   1,1,1,1,1
+    ; unArray[3] += 8
+lb      $t0,unArray+3
+add     $t0,$t0,8
+sb      $t0,unArray+3
+
+; DINAMICO
+    .data   $10010000
+unArray:    .byte   1,1,1,1,1
+id1:	    .word	2
+
+    .text
+    ; unArray[5]=3*unArray[id1];
+la      $t1,unArray  ; prende l'indirizzo di "unArray"
+lw	    $t2,id1      ; copia il valore di id1 in $t2
+add	    $t1,$t1,$t2  ; calcola l'indice [id1];
+lb	    $t0,($t1)    ; copia in $t0 il valore unArray[id1]
+mul	    $t0,$t0,3    ; effettua la moltiplicazione
+sb	    $t0,array1+5 ; copia il risultato in unArray[5]
+```

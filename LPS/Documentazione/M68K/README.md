@@ -8,12 +8,9 @@ Possono essere visti come 2 gruppi da 16 bit, le due word formano una long
 ```
 [00000000 00000000][00000000 00000000]
 ```
-In questa documentazione utilizzeremo questi nomi per i vari tipi di indirizzamento.
-* `reg`: registro
-* `adr`: indirizzo di memoria
-* `num`: numero
 
-**ATTENZIONE** A differenza di MIPS, gli operatori come addizione etc funzionano solo a 2 registri, con il secondo operando, quello che riceve il dato.
+
+**ATTENZIONE** Gli operatori come addizione etc funzionano solo a 2 registri. Il secondo operando sarà quello destinazione dove viene salvato il dato.
 
 Ha 18 registri utilizzabili, 8 data e 8 address
 ```assembly
@@ -35,6 +32,7 @@ END
 ```
 Dove ORG è l'indirizzo di partenza, START è dove il programma inizierà l'esecuzione, e END è dove terminerà l'esecuzione.
 
+
 # Utilizzo valori numerici ed esadecimali
 
 I valori numerici in formato **decimale** sono rappresentati aggiungendo un `#` prima del numero, mentre il registro è scritto direttamente
@@ -44,13 +42,58 @@ add #22,d6
 
 per rappresentare valori in formato esadecimale si mette il prefisso `#$`, mentre per il formato binario `#%`
 ```assembly
-move #$00000016, d0 
+move #$16, d0 
     ;copia il numero 22 in formato esadecimale nel registro d0
 
 move #%10110, d0
     ;copia il numero 22 in formato binario nel registro d0
 ```
 
+# Metodi di indirizzamento
+
+***ATTENZIONE*** Nella documentazione utilizzeremo questi nomi per specificare quali tipi di operandi sono supportati dalle istruzioni. 
+Si definisce *modo di indirizzamento* (*addressing mode*) una regola che, a partire da alcune informazioni, permette di indirizzare una parola.
+
+In m68K ci sono vari modi per indirizzare i dati e prenderne i valori. 
+
+## Immediato
+`Im` Un numero, non è mai destinazione di un'istruzione
+```assembly   
+Im -> #<numero>
+    move #10, d0
+```
+
+## Diretto di registro (dati)
+`Dn` Registro dati, può essere usato in tutte le istruzioni che accettano registri, specialmente quelli aritmetici
+```
+Dn -> <d1/d2/d3/d4/d5/d6/d7>
+    move d0, d1
+```
+## Diretto di registro (indirizzi)
+`An` Registro indirizzi, **NON** può essere usato in tutte le istruzioni, per esempio **NON** può essere usato per la moltiplicazione e divisone.
+```
+An -> <a1/a2/a3/a4/a5/a6/a7>
+    move a0, a1
+```
+
+
+## Indiretto registro 
+`(An)` Si utilizza un registro indirizzi come puntatore. Legge la memoria all'indirizzo di An. Utilizzato nell'indicizzazione dinamica di un array.
+```assembly
+    move.l (a0), d0
+```
+
+## Implicito
+In questa documentazione non trattiamo casi di indirizzamento implicito.
+
+## Diretto Indirizzo
+`Ea` Indirizzo di memoria, valido sia come label che come indirizzo di memoria.
+```
+Ea -> <label/$indirizzo>
+
+    move.l $0x2000, d0
+    move.l unaLabel, d0
+```
 # Comandi
 
 **ATTENZIONE** In alcuni dei comandi possiamo scegliere quale parte dei registri utilizzare, se solo i primi 8 bit, i primi 16 bit o tutti e 32 bit, facciamo ciò aggiungendo uno di questi 3 dopo il comando:
@@ -72,7 +115,6 @@ move.w d7, d0
 move.b d7, d0
     ;copia i primi 8bit di d7 in d0
 ```
-
 ### ***ATTENZIONE***
 
 In questa documentazione metteremo fra [ ] e { } le estensioni disponibili. 
@@ -85,35 +127,36 @@ In { } è specificata l'estensione di default
 
 *move* -> Copia il contenuto del primo nel secondo. Se la destinazione è un registro indirizzi (a), di default usa formato long
 ```assembly
-move <num/reg/adr>, <destinazione>
+move <Im/Dn/An/(An)/Ea>, <Dn/An/(An)/Ea>
 
 move #100, d0
     ;d0 = 100
 move d7, d0
     ;d0 = d7
-move.w  $00002082,$0000208c     ; copia la word dell'address di memoria $2082 nell'address di memoria $208c
+move.w  $2082,$208c     ; copia la word dell'address di memoria $2082 nell'address di memoria $208c
 ```
 È inoltre possibile utilizzare operazioni di somma per indicare address, queste operazioni vengono fatte dal traduttore e non al momento dell'esecuzione
 
 ```assembly
 move.b  $00002080+1,d1     ; copia il valore del byte dell'address di memoria $2081 in d1
 ```
-## add [l w b]
-*addition* -> Effettua la somma di due valori e salva il risultato nel secondo
+## add - adda [l w b]
+*addition* -> Effettua la somma di due valori e salva il risultato nel secondo. `adda` non cambia il CCR
 ```assembly
-add <num/reg/adr>, <destinazione>
+add <Im/Dn/An/(An)/Ea>, <Dn/An/(An)/Ea>
+adda <Im/Dn/An/(An)/Ea> , <An>
 
 add #100, d0
     ;d7 = d7 + 100
 add d7, d0
     ;d0 = d0 + d7
 add.b   #3,$0000208c    ; somma 3 al byte dell'address di memoria $208c
-```
+``` 
 
 ## sub [l w b]
 *subtract* -> Effettua la sottrazione del secondo valore meno il primo e salva il risultato nel secondo 
 ```assembly
-sub <num/reg/adr>, <destinazione>
+sub <Im/Dn/An/(An)/Ea>, <Dn/An/(An)/Ea>
 
 sub d7, d0
     ;d0 = d0 - d7
@@ -135,7 +178,8 @@ Divide il secondo registro per il primo num/reg, salva il risultato nel secondo 
 
 **ATTENZIONE** salva il risultato della divisone nei primi 16 bit del secondo registro, il resto negli ultimi 16 bit. Se si vuole accedere al resto, usare il comando [swap](#swap)
 ```assembly
-divs <num/reg/adr>, <destinazione>
+divs <Im/Dn/(An)/Ea>, <Dn>
+divu <Im/Dn/(An)/Ea>, <Dn>
 
 move #100, d0
     ;d0 = 100
@@ -168,7 +212,8 @@ move.w d0, d2
 
 Moltiplica il secondo registro per il primo valore/registro e salva il risultato nel secondo registro. Il primo operando viene letto con formato `word`, il secondo con formato `long`. 
 ```assembly
-muls <num/reg/adr>, <destinazione>
+muls <Im/Dn/(An)/Ea>, <Dn>
+mulu <Im/Dn/(An)/Ea>, <Dn>
 
 muls #10,d1
     ;d1 = d1 * 10
@@ -183,7 +228,7 @@ muls    $00002810,d0    ; moltiplica d0 per il valore dell'address $2810
 ## swap [ ]
 *swap* -> Inverte le due word all'interno dello stesso registro, se guardiamo il registro come se fosse `[a,b]`, diventerà `[b,a]`, utile per la divisione
 ```assembly
-swap <reg>
+swap <Dn>
 
     ;prima: d0 = 0x0000FFFF
 swap d0
@@ -193,7 +238,7 @@ swap d0
 ## clr [ ]
 *clear* -> Azzera il contenuto del registro messo dopo il comando
 ```assembly
-clr <reg>
+clr <Dn/(An)>
 
     ;prima: d0 = 0x01495840
 clr d0
@@ -204,6 +249,8 @@ clr d0
 ## exg 
 *exchange* -> Scambia il contenuto di due registri, **ATTENZIONE**, funziona solo con 32 bit
 ```assembly
+exg <Dn/An>, <Dn/An>
+----------------------------
     ;prima: d0 = 0x12940000
     ;prima: d1 = 0x00000010
 exg d0,d1
@@ -213,8 +260,8 @@ exg d0,d1
 ## neg [l w b] {w}
 *negate* -> Cambia il segno al valore del registro messo dopo l'operando
 ```assembly
-neg <reg>
-
+neg <Dn/(An)/Ea>
+----------------------------
     ;prima: d0 = 100 
 neg d0
     ;dopo:  d0 = -100 
@@ -223,9 +270,10 @@ neg d0
 *extend* -> Estende un registro al formato specificato, usato per convertire un registro da byte a word (.w), o da word a long (.l). **ATTENZIONE**, il funzionamento del comando è prendere l'ultimo bit del tipo di formato che volete convertire e sostituirlo a tutti i restanti bit del nuovo formato, per esempio da byte a word, copia l'ultimo bit del byte e lo mette in tutti i restanti bit della word. 
 
 ```assembly
-ext.w <reg> ;converte la parte byte nella word
-ext.l <reg> ;converte la parte word nella long
+ext.w <Dn> ;converte la parte byte nella word
+ext.l <Dn> ;converte la parte word nella long
 
+----------------------------
 
     ;prima: d0 = 0xFF -> 1111 1111 (negativo, quindi copia l'1)
 ext.w d0
@@ -252,14 +300,14 @@ Entrambi i comandi `cmp` e `tst` salvano il risultato del confronto nel `CCR`, c
 ## tst [l w b] {w}
 *test* -> Comparazione con lo 0
 ```assembly
-tst <reg>
+tst <An/Dn/(An)/Ea>
     ; comparazione con 0
 ```
 
 ## cmp [l w b] {w}
 *compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`.
 ```assembly
-cmp <num/reg/adr>, <reg>
+cmp <Im/Dn/(An)/Ea>, <Dn>
     ; comparazione di due valori 
 ```
 ## Comandi di branch
@@ -335,12 +383,17 @@ il primo elemento del comando sarà la maschera, (tranne nel not), il secondo el
 ```assembly
 not <reg>
 
-or <num/reg>, <destinazione>
-and <num/reg>, <destinazione>
-eor <num/reg>, <destinazione>
+or <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
+and <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
+eor <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 esempi:
 ```assembly
+    ; per semplicità di scrittura, sono rappresentati solo 8 dei 32 bit
+    ; d0 = 01100111
+    ; in realtà sarebbe
+    ; d0 = 00000000000000000000000001100111
+
     ; d0 = 01100111 (maschera)
     ; d1 = 11001100 
     ; d2 = 11001100 
@@ -369,7 +422,7 @@ Uguale al comando `<<` in C
 
 
 ```assembly
-lsl <reg/num/adr>, <destinazione>
+lsl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 
     ;d0 = 01011101 (in binario)
     ;d2 = 3 (in decimale)
@@ -386,7 +439,7 @@ Lo `shift sinistro` logico ha lo scopo aritmetico di effettuare `(N * 2^k) mod 2
 Uguale al comando `>>` in C
 
 ```assembly
-lsr <reg/num/adr>, <destinazione>
+lsr <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 
     ;d0 = 11011101 (in binario)
     ;d2 = 3 (in decimale)
@@ -401,9 +454,9 @@ Lo `shift destro` logico è uguale a calcolare `N/2^k` dove N è il numero dove 
 *arithmetical shift right/left* -> Sposta tutti i bit di di un registro di tot posizioni a destra/sinistra. Tiene conto del segno del numero. Se verso destra, i numeri aggiunti saranno uguali al numero più a sinistra, se verso sinistra, il segno verrà ignorato, ma se c'è un cambio di segno, verrà segnato sul CCR
 
 ```assembly
-asr <reg/num/adr>, <destinazione>
+asr <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 
-asl <reg/num/adr>, <destinazione>
+asl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 
     ;d0 = 10010111 (in binario)
     ;d2 = 2 (in decimale)
@@ -423,8 +476,8 @@ Bisogna fare attenzione nel caso che il numero sia negativo, o se il numero è g
 ## rol / ror
 *rotate left / rotate right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinistra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
-rol <reg/num>, <destinazione>
-ror <reg/num>, <destinazione>
+rol <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
+ror <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 
     ;d0 = 01000011
 rol #2, d0
@@ -439,24 +492,24 @@ Il primo operando è il bit da leggere, il secondo sarà dove effettuare l'opera
 *Bit test* -> Testa il bit a posizione specificata del registro, setta la condizione del CCR `equal` al valore del bit a quella posizione, poi possiamo usare il comando `beq` per i branch. Non modifica la destinazione
 
 ```assembly
-btst <num/reg>, <reg/adr>
+btst <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 ## bclr 
 *Bit clear* -> Setta a 0 il bit a posizione specificata del registro.
 ```assembly
-bclr <num/reg>, <destinazione>
+bclr <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 
 ## bchg
 *Bit change* -> Inverte il bit a posizione specificata del registro.
 ```assembly
-bchg <num/reg>, <destinazione>
+bchg <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 
 ## bset
 *Bit set* -> Setta ad 1 il bit a posizione specificata del registro.
 ```assembly
-bset <num/reg>, <destinazione>
+bset <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 
 # La memoria in M68K
@@ -501,7 +554,7 @@ move.w #1234, unaVariabile
 Naturalmente la lettura e scrittura dipendono dal formato di dato utilizzato.
 
 ## equ
-*equals* -> Il comando `equ` è usato per assegnare ad un indirizzo di memoria una variabile
+*equals* -> La direttiva `equ` è usata per assegnare ad un indirizzo di memoria una variabile
 
 Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito dall'assembler e sostituito con l'indirizzo di memoria.
 
@@ -510,3 +563,97 @@ Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito d
 
 unaVariabile equ 5020
 ```
+
+# Indirizzi di Memoria e Label
+Gli indirizzi possono essere scritti in forme più comode utilizzando `label`. 
+Ogni label è legata ad un indirizzo di memoria, ovvero rappresenta tale indirizzo. In fase di traduzione l'assembler trasforma ogni label nell'indirizzo ad essa legato. Ha quindi senso operazioni come
+```assembly
+; se pippo è una label, l'indirizzo successivo sarà l'indirizzo pippo+1, quello dopo ancora pippo+2, e così via..-
+
+        move.b  d4,d6
+pippo:  cmp #256,d0 
+        clr d6              ;pippo+1
+        move.w  d0,d2       ;pippo+2
+```
+Quando il programma viene assemblato, ogni istruzione è convertita in un numero a 32 bit (4 byte). Quando il programma viene eseguito, questi numeri sono caricati nella memoria ed eseguiti. Le label sono solo un "alias" all'indirizzo di memoria dove è salvata l'istruzione. Quando per esempio facciamo un branch ad una label, quello che in realtà sta succedendo, è che il programma continua l'esecuzione all'indirizzo di memoria dove è salvata la label.
+
+# Allocazione statica della memoria
+L’allocazione della memoria statica viene fatta mediante le `sezioni`; ogni sezione ha un `indirizzo di inizio sezione`.
+
+Si può allocare la memoria in maniera "statica" (cioè non si può espandere).
+
+Una direttiva di definizione dati:
+* indica quanti byte devono essere allocati e se necessario, i valori da memorizzare.
+* non indica l’indirizzo di memoria dei byte da allocare: tale indirizzo è determinato automaticamente dall'assembler.
+
+## org
+Per allocare la memoria viene utilizzata la direttiva 𝒐𝒓𝒈 seguita dall’indirizzo di inizio 
+sezione. Tale direttiva imposta infatti l’indirizzo di memoria iniziale per i successivi che seguiranno.
+```assembly
+org     $1100
+move.l  #$12,d0
+tst d1
+```
+Indirizzo           |  Comando        
+:------------------:|:-------------------
+1100    |    org     $1100
+1100    |   move.l  #$12,d0
+1104    |   tst d1
+
+## dc [l w b]
+**define constant** -> La direttiva `dc` è usata per definire costanti.
+
+Se non è specificata una estensione di lunghezza (b,w,l), per le stringhe è utilizzato il formato *byte*, mentre per i valori numerici il formato *word*.
+``` assembly
+<label>: dc <valore>
+
+x: dc.b 10
+v:  dc.l    1,3,4
+    ; alloca 3 long, la prima con valore 1, la seconda con valore 3 e la terza con valore 4
+    ; "v" è l'indirizzo della prima long
+-----------------------------------------
+    org $2800
+v:  dc.l    0       ; v ha indirizzo 2800
+w:  dc.l    220200  ; w ha indirizzo 2804 
+    ; ovvero 2800 (org) + 4 byte (long v)
+```
+Possiamo usare `dc` per definire array e stringhe (di lunghezza fissa).
+
+
+Per esempio per definire un array di 5 elementi tutti a valore 1:
+```assembly
+    ; long unArray[ 5 ] = { 1, 1, 1, 1, 1 };
+    org $4000
+unArray: dc.l 1,1,1,1,1
+```
+Potremmo poi accedere ai valori dell'array usando il nome della label. Se vogliamo iterare gli elementi dell'array, dovremmo leggere l'indirizzo dell'array, e poi incrementarlo in base alla grandezza degli elementi. Oppure se dobbiamo leggere un elemento specifico, possiamo usare `label+posizione`
+```assembly
+; STATICO
+    ; copia elemento a posizione 3
+move.l unArray+2, d0
+
+; DINAMICO
+    ; prende l'indirizzo di "unArray"
+move.l #unArray, a0
+    ; incrementa l'indirizzo di 4 byte
+    ; perchè il tipo degli elementi di "unArray" è long
+add.l #4, a0
+    ; copia elemento a posizione 1
+move.l (a0), d0
+
+```
+C'è un altro tipo di rappresentazione per gli array, che per una serie di problemi è consigliabile ***non*** *utilizzare*.
+```assembly
+    move.w   el3,d0
+    add.w    el0,d0
+; fine codice
+
+; int x[ 4 ] = { 7, 0, 3, 8 };
+    org $4000
+el0: dc.w     7
+el1: dc.w     0
+el2: dc.w     3
+el3: dc.w     8
+```
+
+
