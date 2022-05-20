@@ -591,15 +591,17 @@ lbu $s1, 3000
 ```
 ### la 
 *Load address* -> Copia l'indirizzo della label nel registro
+
 ```
 la <reg>, <label>
 
 la $s0, unaLabel
-```
 ```assembly
+
 # Indirizzi di Memoria e Label
 Gli indirizzi possono essere scritti in forme più comode utilizzando `label`. 
 Ogni label è legata ad un indirizzo di memoria, ovvero rappresenta tale indirizzo. In fase di traduzione l'assembler trasforma ogni label nell'indirizzo ad essa legato. Ha quindi senso operazioni come
+
 ```assembly
 ; se pippo è una label, l'indirizzo successivo sarà l'indirizzo pippo+1, quello dopo ancora pippo+2, e così via...
 
