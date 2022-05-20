@@ -592,11 +592,11 @@ lbu $s1, 3000
 ### la 
 *Load address* -> Copia l'indirizzo della label nel registro
 
-```
+```assembly
 la <reg>, <label>
 
 la $s0, unaLabel
-```assembly
+```
 
 # Indirizzi di Memoria e Label
 Gli indirizzi possono essere scritti in forme più comode utilizzando `label`. 
