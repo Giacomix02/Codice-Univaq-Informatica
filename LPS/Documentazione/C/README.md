@@ -11,6 +11,9 @@ Nome           |  Dimensione
 # Comandi
 ## include
 Include delle librerie esterne ad esempio <stdio.h>
+```c
+include <stdio.h>
+```
 ## define
 È una macro che permette di definire un "alias" ad un pezzo di codice. Quando il programma viene compilato, il compilatore rimpiazza ogni occorrenza dell'alias con il valore definito
 ```c
@@ -83,7 +86,7 @@ int a = 4;  // a = 0000 0100
 a << 1; // a = 0000 1000
 ```
 
-## Cicli
+# Cicli
 
 ## for
 
@@ -170,14 +173,15 @@ Line linea = {
 };
 ```
 
-## Array 
+# Array 
 
-### Moniodimensionali
+## Monodimensionali
 ```c
 int name[length];
 //esempio
 int array[4] = {2,1,3,4}; //valori iniziali
 ```
+
 ```c
 /*
  * array1 = { 10, 12, -4, 0, 0, 0, 9 } di dimensione 7
@@ -192,11 +196,12 @@ float array2[ 5 ] = { 2.5f, 5.0f, 1.2f }
 // array3 = { 0.7, 0.0, 0.0, 3.4, -1.1, 0.0, 0.0, 0.0 } di dimensione 8
 float array3[ 8 ] = { 0.7f, [ 3 ] = 3.4f, -1.1f };
 ```
-### Bidimensionali
+## Bidimensionali
 
 ```c
 array2 = array3  //ERRORE: gli array non possono essere assegnati
-int array4[ ][ 6 ] = { { 100 }, { 10, 20, 30, 40, 50, 60 }, { 1, 2, 3 } };  //definizione di array bidimensionale (multidimensionale)
+int array4[ ][ 6 ] = { { 100 }, { 10, 20, 30, 40, 50, 60 }, { 1, 2, 3 } };
+//definizione di array bidimensionale (multidimensionale)
 ```
 ***ATTENZIONE*** In un array bidimensionale, o in generale multidimensionale, la prima dimensione può essere omessa, mentre tutte le altre vanno per forza specificate
 ```c
