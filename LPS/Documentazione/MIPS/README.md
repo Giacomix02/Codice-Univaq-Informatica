@@ -408,11 +408,10 @@ xor $s4, $s4, $s0
 *Shift left logical* -> Sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 Uguale al comando << in C
 ```assembly
-sll <destinazione>, <registro>, <registro>
+sll <destinazione>, <registro>, <numero>
 
     ;s0 = 01011101 (in binario)
-    ;s2 = 3 (in decimale)
-sll $s0, $s0, $s2
+sll $s0, $s0, 3
     ;s0 = 11101000
 ```
 
@@ -420,11 +419,10 @@ sll $s0, $s0, $s2
 *Shift right logical* -> Sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
 Uguale al comando >> in C (undefined behaviour)
 ```assembly
-srl <destinazione>, <registro>, <registro>
+srl <destinazione>, <registro>, <numero>
 
     ;s0 = 11011101 (in binario)
-    ;s2 = 3 (in decimale)
-srl $s0, $s0, $s2
+srl $s0, $s0, 3
     ;s0 = 00011011
 ```
 
