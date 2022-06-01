@@ -1,0 +1,79 @@
+   # memorizzo una variabile di tipo struct tipo con:
+   # 1 word 
+   # 2 byte
+   # 1 half
+   # definisco dei nomi simbolici per gli offets dei vari membri rispetto all'indirizzo del primo membro 
+   
+   .eqv off_a,0
+   .eqv off_b,4
+   .eqv off_c,5
+   .eqv off_d,6
+    	
+    	.data 0x10010000
+s1:     .word 128000
+    	.byte 'Z',250
+    	.half 450
+s2:     .word 0
+    	.byte 0,0
+    	.half 0
+
+ps2:	.word s2
+
+.text
+
+inizio_codice:
+	la $t2,s2
+	
+	la $t0,s1 #t0 contiene indirizzo s1
+		  # s1.b si trova a l'indirizzo di s1+4
+		  
+#	si.b = 'X'
+	li $t3,'X'
+	sb $t3,4($t0)
+	
+#	si = s2
+#	copio il contenuto di s1 in s2
+#	copio 2 word a partire da s1 all'indirizzo a partire da s2
+
+	lw $t4, s1
+	sw $t4,s2
+	lw $t4,s1+4
+	sw $t4,s2+4
+	
+#	s2.a  += 96000
+	la $t5,s2
+	lw $t4,off_a($t5)
+	add $t4,$t4,96000
+	sw $t4,off_a($t5)
+	
+# 	s2.c += s1.b
+	lbu $t3,off_b($t0)
+	lbu $t4,off_c($t5)
+	add $t4,$t4,$t3
+	sb $t4,off_c($t5)
+
+#	(*ps2).d *= 3
+	lh $t3,off_d($t2)
+	mul $t3,$t3,3
+	sh $t3,off_d($t2)
+	
+#	ps1 = ps2
+	move $t1,$t2
+
+#	ps1 -> a = -8800
+	li $t3,-88000
+	sw $t3,off_a($t1)
+
+#	ps1 = &s1
+	la $t1,s1
+
+#	*ps2 = *ps1
+#	copio l'oggetto puntato da ps1 nell'oggetto puntato da ps2, overro
+#	copio 2 word a partire dall'indirizzo contenuto in t1 all'indirizzo contenuto in t2
+	
+	lw $t4,($t1)
+	sw $t4,($t2)
+	lw $t4,4($t1)
+	sw $t4,4($t2)
+
+fine_codice:
