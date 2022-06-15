@@ -655,5 +655,97 @@ el1: dc.w     0
 el2: dc.w     3
 el3: dc.w     8
 ```
+# Stack e funzioni
+Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
 
+in M68K quando una funzione viene chiamata, viene aggiunto automaticamente un frame allo stack che contiene l'indirizzo di ritorno della funzione, in questo modo è facile implementare sia funzioni che non chiamano altre funzioni, che funzioni ricorsive.
 
+## Lettura e scrittura dello stack
+Il registro speciale `sp` tiene conto della posizione della cima dello stack. Quando dobbiamo aggiungere informazioni, dobbiamo decrementare il registro `sp` per poi salvare all'indirizzo di `sp`, il dato da memorizzare. Quando invece dobbiamo prelevare un dato o rimuovere un frame, dobbiamo fare l'incremento dello stack pointer.
+
+M68K ci permette facilmente di aggiungere e rimuovere tramite la sintassi `(sp)` che permette anche di modificare il valore di `sp`.
+
+## Lettura dello stack, pre decremento, post incremento
+Usa la stessa sintassi della lettura in memoria. ***ATTENZIONE*** Il post/pre incremento/decremento usano il [.l, .w, .b] come quantità di bit da incrementare/decrementare.
+
+Comando  |  Funzione        
+:-------:|:-------------------
+(sp)     |  Seleziona elemento alla cima dello stack
+-(sp)    |  Seleziona elemento  alla cima, e poi decremento, usato per aggiungere un dato allo stack
+(sp)+    |  Seleziona elemento alla cima dello stack, e poi incremento, usato per prelevare un dato dallo stack
+N(sp)    | N un numero, legge a posizione sp + N, usato per prelevare i parametri da una funzione
+
+```assembly
+; sp = $1000
+; salva 10 alla cima dello stack, poi decrementa sp di 4 (l)
+    move.l 10, -(sp)
+; sp = $1004
+
+; salva 10 alla cima dello stack, poi decrementa sp di 2 (w)
+    move.w 20, -(sp)
+; sp = $1006
+
+; preleva il primo elemento dallo stack, poi incrementa sp di 2 (w)
+    move.w (sp)+, d0
+; d0 = 20
+; sp = $1004
+
+; preleva il primo elemento dallo stack, poi incrementa sp di 4 (l)
+    move.l (sp)+, d1
+; d1 = 10
+; sp = $1000
+
+; salva 1000 a posizione sp + 4, non modifica sp
+    move.l 1000, 4(sp)
+```
+Naturalmente l'offset può anche essere un alias dato da `equ`, per esempio si può usare 
+```assembly
+parametro_1: equ $0
+parametro_2: equ $4
+
+move.l parametro_1(sp), d0
+move.l parametro_2(sp), d1
+```
+## Chiamata a funzione e ritorno da funzione
+Quando chiamiamo una funzione, M68K automaticamente gestisce l'aggiunta del frame dove è contenuto l'indirizzo di ritorno, e nel ritorno, rimuove il frame.
+
+## bsr
+Il comando `bsr` aggiunge un frame allo stack che contiene l'indirizzo di ritorno e decrementa lo `sp` di 4 byte. Poi effettua il salto alla label specificata. 
+```assembly
+bsr <label>
+
+bsr una_funzione
+```
+## rts
+Il comando `rts` prende l'ultimo elemento dello stack che verrà usato per l'indirizzo di ritorno, poi incrementa lo `sp` di 4 byte.
+```
+rts
+```
+Esempio di bsr e rts
+```assembly
+; i parametri vengono scritti al contrario, quindi primo è num_2, poi num_1
+    move.l #3, -(sp) ; push di num_2 
+    move.w #2, -(sp) ; push di num_1
+    sub.l #4, sp     ; riserva spazio per il risultato
+    bsr somma
+    move.l (sp)+, d0 ; preleva il risultato
+    add.l #6, sp     ;pop dei parametri
+    bra end
+; | indirizzo |
+; -------------
+; | risultato |
+; -------------
+; | num_1     |
+; -------------
+; | num_2     |    
+risultato: equ 4
+par_1: equ 8
+par_2: equ 10
+
+somma:
+    move.w par_1(sp), d1 ; num_1  
+    move.l par_2(sp), d0 ; num_2
+    add.l d0, d1         ; d1 = num_2 + num_1
+    move.l d1, risultato(sp) ; salva risultato
+    rts
+```
