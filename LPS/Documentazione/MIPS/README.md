@@ -12,9 +12,11 @@ Gli operatori come addizione etc possono funzionare sia a 2 operandi che 3 opera
 
 I register general purpose sono:
 ```assembly
-a0,a1,a2,a3
-t0,t1,t2,t3,t4,t5,t6,t7,t8,t9
-s0,s1,s2,s3,s4,s5,s6,s7
+Registri parametri  -> a0,a1,a2,a3
+Registri temporanei -> t0,t1,t2,t3,t4,t5,t6,t7,t8,t9
+Registri salvati    -> s0,s1,s2,s3,s4,s5,s6,s7
+Registri ritorno    -> v0,v1
+Registri speciali   -> sp, ra
 ```
 Possono essere anche usati tramite solo il numero da `1-32`.
 
@@ -688,3 +690,60 @@ lb	    $t0,($t1)    ; copia in $t0 il valore unArray[id1]
 mul	    $t0,$t0,3    ; effettua la moltiplicazione
 sb	    $t0,array1+5 ; copia il risultato in unArray[5]
 ```
+
+
+## Stack e funzioni
+Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
+
+In MIPS, il linguaggio non ci aiuta nella gestione dei frame e indirizzi di ritorno, deve pensare tutto lo sviluppatore. Quando una funzione viene chiamata, il registro `$ra` verrà modificato con l'indirizzo del chiamante, se abbiamo bisogno, all'interno di questa funzione, di chiamarne un altra, oppure fare ricorsione, allora dobbiamo salvare l'indirizzo di ritorno all'interno dello stack, per poi decrementare lo stack pointer.
+
+Quando si chiama una funzione, la funzione chiamata avrà il compito di allineare lo stack pointer in modo da ritornare alla posizione dove era quando la funzione è stata chiamata. Se ha eventuali valori di ritorno, si troveranno dove si trova lo stack pointer.
+
+esempio: (ricorda che è una pila, gli elementi vengono aggiunti dal basso verso l'alto)
+```
+Chiamata:
+
+| return address | (SP)
+------------------
+| parameter 2    |
+------------------
+| parameter 1    |
+
+Ritorno:
+| risultato      | (SP)
+``` 
+Naturalmente potrebbe essere non necessario usare lo stack, dipende sempre dall'implementazione dello sviluppatore.
+## Lettura e scrittura dello stack
+In MIPS non ci sono comandi per gestire lo stack, ma si dovranno usare i `read / store` che si userebbero normalmente per la gestione della memoria. L'unica differenza è che usiamo il registro $sp in mezzo parentesi tonde.
+
+Possiamo anche aggiungere un offset che andrà a selezionare N + SP. Non modifica `$sp`
+
+```assembly
+; lettura
+lw	    $t0,($sp)
+; scrittura
+sw	    $t0,($sp)
+; offset, lettura di sp + 4
+sw     $t0, 4($sp) 
+```
+
+## Chiamata a funzione e ritorno da funzione
+In mips troviamo un comando che setta il valore di $ra con l'indirizzo della funzione chiamante, e uno che permette di fare un salto all'indirizzo di ritorno.
+
+## jal
+`jump and link` -> Setta il valore di $ra con l'indirizzo della funzione chiamante, e poi fa il salto alla label della funzione.
+```assembly
+    jal <label>
+;esempio
+    jal funzione1
+```
+
+## jr 
+`jump register` -> Fa il salto alla label della funzione, di solito si usa l'indirizzo `$ra`, ma qualsiasi va bene.
+```assembly
+    jr <registro>
+;esempio
+    jr $ra
+```
+## convenzione
+La convenzione di MIPS ci dice che i registri temporanei (t) possono essere usati a piacimento, i registri salvati (s) possono essere usati dalla funzione chiamata, ma dovranno essere ripristinati ai valori iniziali prima di ritornare. Si può usare i registri `v` per i valori di ritorno e `a` per i parametri, oppure usare lo stack se non è una funzione che chiama altre funzioni.
