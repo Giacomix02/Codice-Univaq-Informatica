@@ -235,7 +235,7 @@ swap d0
     ;dopo:  d0 = 0xFFFF0000
 ```
 
-## clr [ ]
+## clr [l w b]
 *clear* -> Azzera il contenuto del registro messo dopo il comando
 ```assembly
 clr <Dn/(An)>
@@ -243,6 +243,12 @@ clr <Dn/(An)>
     ;prima: d0 = 0x01495840
 clr d0
     ;dopo:  d0 = 0x00000000
+
+;oppure
+
+;prima: d0 = 0x01495840
+clr.w d0
+;dopo:  d0 = 0x01490000 
 ```
 
 
@@ -354,10 +360,10 @@ comando <label>
 e sono:
 * `bmi` se un valore è negativo
 * `bpl` se un valore è positivo
-* `bcs` se dopo aver fatto un operazione aritmetica su numeri unsigned, se c'è stato riporto nella cifra più a sinistra (più significativa), per esempio, prendendo un byte per numero, si fa `255 + 9`, il risultato sarà `8`, perchè `264` è più grande del numero massimo rappresentabile da un byte, che è 255, se ciò è accaduto, allora si dice che c'è stato **riporto**. vale anche se un numero va da positivo a negativo, es: 1-3 sarà 254. 
-* `bcc` come bcs, ma se **NON** c'è stato riporto
-* `bvc` come bcc, ma con numeri signed
-* `bvs` come bcs, ma con numeri signed
+* `bcs` (Branch Carry Set) se dopo aver fatto un operazione aritmetica su numeri unsigned, se c'è stato riporto nella cifra più a sinistra (più significativa), per esempio, prendendo un byte per numero, si fa `255 + 9`, il risultato sarà `8`, perchè `264` è più grande del numero massimo rappresentabile da un byte, che è 255, se ciò è accaduto, allora si dice che c'è stato **riporto**. vale anche se un numero va da positivo a negativo, es: 1-3 sarà 254. 
+* `bcc` (Branch Carry Clear) come `bcs`, ma se **NON** c'è stato riporto
+* `bvs` (Branch oVerflow Set) se dopo aver fatto una operazione aritmetica, viene causato un overflow (per esempio: se venissero sommati 2 numeri positivi signed, e ne uscisse come risultato un numero negativo, è Overflow)
+* `bvc` (Branch oVerflow Clear) come `bvs`, ma **NON** c'è stato Overflow
 
 
 ## Branch incondizionato
@@ -371,20 +377,20 @@ Come visto prima nei branch, nel CCR troviamo varie informazioni durante l'esecu
 ```assembly
 comando <destinazione>
 ```
-* `scc` se non c'è stato riporto (carry clear)
-* `scs` se c'è stato riporto (carry set)
-* `seq` se è uguale (equal)
-* `sne` se non è uguale (not equal)
-* `sge` se è maggiore uguale (greater or equal) **SIGNED**
-* `sgt` se è maggiore (greater) **SIGNED**
-* `sle` se è minore uguale (less or equal) **SIGNED**
-* `sls` se è più piccolo o uguale (lower) **UNSIGNED**
-* `slt` se è minore (less) **SIGNED**
-* `shi` se è più grande (higher) **UNSIGNED**
-* `smi` se è negativo (minus)
-* `spl` se è positivo (positive)
-* `svc` se non c'è stato overflow (overflow clear)
-* `svs` se c'è stato overflow (overflow set)
+* `scc` se non c'è stato riporto (Carry Clear)
+* `scs` se c'è stato riporto (Carry Set)
+* `seq` se è uguale (EQual)
+* `sne` se non è uguale (Not Equal)
+* `sge` se è maggiore uguale (Greater or Equal) **SIGNED**
+* `sgt` se è maggiore (Greater) **SIGNED**
+* `sle` se è minore uguale (Less or Equal) **SIGNED**
+* `sls` se è più piccolo o uguale (LOwer) **UNSIGNED**
+* `slt` se è minore (Less Than) **SIGNED**
+* `shi` se è più grande (HIgher) **UNSIGNED**
+* `smi` se è negativo (MInus)
+* `spl` se è positivo (Positive)
+* `svc` se non c'è stato overflow (oVerflow Clear)
+* `svs` se c'è stato overflow (oVerflow Set)
 * `sf`  se è falso (false)
 * `st`  se è vero (true)
 
@@ -392,12 +398,12 @@ comando <destinazione>
 # Operazioni sui bit e logici
 Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
 
-## not, or, and, xor
+## not, or, and, eor
 Effettua le operazioni not, or, and, xor, tra un registro e una maschera. La maschera è una sequenza di bit che specificano a quali posizioni si deve effettuare l'operazione logica. I vari operatori hanno funzioni equiparabili a:
 * `NOT` Inverso di tutti i bit (1 diventa 0, 0 diventa 1), non usa una maschera
 * `OR`  Setta ad 1 i bit alle posizioni della maschera, senza modificare gli altri
 * `AND` Prelevare i bit alle posizioni della maschera, oppure controllare se un bit è segnato ad 1 nella posizione segnata nella maschera
-* `XOR` Inverso dei bit alle posizioni della maschera.
+* `EOR` Inverso dei bit alle posizioni della maschera.
 
 il primo elemento del comando sarà la maschera, (tranne nel not), il secondo elemento sarà il registro dove effettuare l'operazione, e dove verrà salvata
 ```assembly
@@ -433,7 +439,7 @@ eor d0, d4
     ; d4 = 10101011
 ```
 
-## lsl 
+## lsl [l w b] {w}
 *logical shift left* -> Sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 
 Uguale al comando `<<` in C
@@ -448,12 +454,21 @@ lsl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d2 = 3 (in decimale)
 lsl d2, d0
     ;d0 = 11101000
+
+;più un grande:
+
+    ;d0 = 87658765 (in esadecimale) 
+lsl #4, d0
+    ;d0 = 87657650 (la word a sinistra non è stata shiftata) 
+
+lsl.l #5, d0
+    ;d0 = ECAECA00 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Lo `shift sinistro` logico ha lo scopo aritmetico di effettuare `(N * 2^k) mod 2^l` dove N = numero dove effettuare lo shift, k è il numero di bit da spostare a sinistra, e l è il numero di bit nel formato usato.
 
 
-## lsr 
+## lsr [l w b] {w}
 *logical shift right* -> Sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
  
 Uguale al comando `>>` in C
@@ -465,12 +480,21 @@ lsr <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d2 = 3 (in decimale)
 lsr d2, d0
     ;d0 = 00011011
+
+;più un grande:
+
+    ;d0 = 87658765 (in esadecimale) = 10000111011001011000011101100101
+lsr #4, d0
+    ;d0 = 87650876 (la word a sinistra non è stata shiftata)
+
+lsr.l #5, d0
+    ;d0 = 043B2843 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Lo `shift destro` logico è uguale a calcolare `N/2^k` dove N è il numero dove effettuare lo shift e `k` è la quantità dello shift, oppure semplicemente, ogni volta che spostiamo di una posizione, il numero viene diviso per 2.
 
 
-## asr / asl 
+## asr / asl [l w b] {w}
 *arithmetical shift right/left* -> Sposta tutti i bit di di un registro di tot posizioni a destra/sinistra. Tiene conto del segno del numero. Se verso destra, i numeri aggiunti saranno uguali al numero più a sinistra, se verso sinistra, il segno verrà ignorato, ma se c'è un cambio di segno, verrà segnato sul CCR
 
 ```assembly
@@ -484,6 +508,15 @@ asl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 asr d2, d0
 
     ;d0 = 11100101
+
+;più in grande:
+
+    ;d0 = 87658765 (in esadecimale)
+asr #4, d0
+    ;d0 = 8765F876 (la word a sinistra non è stata shiftata)
+
+asr.l #5, d0
+    ;d0 = FC3B2FC3 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Aritmeticamente, lo  `shift sinistro` aritmetico è uguale a calcolare `N*2^k` dove N è il numero dove effettuare lo shift e `k` è la quantità dello shift, oppure semplicemente, ogni volta che spostiamo di una posizione, il numero viene moltiplicato per 2. 
@@ -493,7 +526,7 @@ Mentre per lo `shift destro` aritmetico è uguale a calcolare `N/2^k` dove N è 
 
 Bisogna fare attenzione nel caso che il numero sia negativo, o se il numero è grande, visto che potrebbe andare in overflow.
 
-## rol / ror
+## rol / ror [l w b] {w}
 *rotate left / rotate right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinistra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
 rol <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
@@ -502,6 +535,15 @@ ror <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d0 = 01000011
 rol #2, d0
     ;d0 = 11010000
+
+;più in grande:
+
+    ;d0 = 87658765 (in esadecimale)
+rol #4, d0
+    ;d0 = 87657658 (la word a sinistra non è stata ruotata)
+
+rol.l #5, d0
+    ;d0 = ECAECB10 (stavolta con .l l'intero valore è stato ruotato)
 ```
 
 # Operazioni sui singoli bit
