@@ -20,8 +20,7 @@ Registri speciali   -> sp, ra
 ```
 Possono essere anche usati tramite solo il numero da `1-32`.
 
-I registri vengono usati con il carattere $
-> $s0, $1
+I registri vengono usati con il carattere `$s0, $1`
 
 Ci sono poi altri due registri specific purpose, usati nella divisone e moltiplicazione. Per esempio nella moltiplicazione viene usato per rappresentare il numero in 64 bit. Mentre per la divisione per salvare il risultato e il resto
 ```c
@@ -58,14 +57,14 @@ Im -> <numero>
 ```
 
 ## Diretto registro
-`An` Registro indirizzi, **NON** può essere usato in tutte le istruzioni, per esempio **NON** può essere usato per la moltiplicazione e divisone.
+`Reg` Un qualsiasi registro
 ```
-An -> <s0/s1/.../s7/t0/t1/.../t7>
+Reg -> <s0/s1/.../s7/t0/t1/.../t7>
     add $s0, $s1, $s2
 ```
 
 ## Indiretto registro 
-`(An)` Si utilizza un registro indirizzi come puntatore. Legge la memoria all'indirizzo di An. Utilizzato nell'indicizzazione dinamica di un array.
+`(Reg)` Si utilizza un registro come puntatore. Legge la memoria all'indirizzo di Reg. Utilizzato nell'indicizzazione dinamica di un array e stack.
 ```assembly
     lbu	$t0,($t1)
 ```
@@ -82,7 +81,7 @@ Viene implicitamente utilizzato un registro per eseguire una particolare operazi
 ## li
 *load immediate* -> Mette nel registro destinazione il valore immediato (numero), il primo operando sarà il registro dove mettere il valore, il secondo operando, il numero da mettere.
 ```assembly
-li <destinazione>, <numero>
+li <Reg>, <Im>
 
 li $s0, 100
     ;s0 = 100
@@ -90,16 +89,16 @@ li $s0, 100
 ## lui
 *load upper immediate* -> Mette a 0 tutti i primi 16bit (half) del registro e poi mette nel registro destinazione il valore immediato (numero) nella seconda word.
 ```assembly
-lui <destinazione>, <numero>
+lui <Reg>, <Im>
 lui $s0, 0xFFFF
     ;s0 = 0xFFFF 0000
 ```
 
 
-## move 
+## move
 Serve a copiare il valore di un registro in un altro registro. Il primo sarà il registro dove verrà copiato il valore, il secondo invece è dove verrà preso il valore. Copia tutto il registro (word)
 ```assembly
-move <destinazione>, <registro>
+move <Reg>, <Reg>
 
 move $s0, $t0
     ;s0 = t0
@@ -114,7 +113,7 @@ Somma il secondo e terzo operando e mette il risultato nel primo
 * `addiu` uguale a addiu ma **unsigned**
 Solo il terzo operando può essere un numero
 ```assembly
-add <destinazione>, <registro>, <registro/numero>
+add <Reg>, <Reg>, <Reg/Im>
 
 add $s0, $t1, 100
     ;setta a s0 la somma di t1 + 100
@@ -137,7 +136,7 @@ Fa la sottrazione
  tra secondo e terzo operando, mettendo il risultato nel primo
 
 ```assembly
-sub <destinazione>, <registro>, <registro/numero> 
+sub <Reg>, <Reg>, <Reg/Im> 
 
 sub $s0, $t1, $t2
     ;s0 = t1 - t2
@@ -171,7 +170,7 @@ Effettua la divisione intera tra secondo operando (dividendo) e terzo operando (
 **NOTA**: Il risultato viene calcolato esclusivamente in formato intero (NON ARROTONDATO), il resto viene perduto, per avere il resto usare `div` [due operandi](#div-due-operandi) 
 
 ```assembly
-div <destinazione>, <registro>, <registro/numero>
+div <Reg>, <Reg>, <Reg/Im>
 
 div $a1, $t1, $t2
     ;a1 = t1 / t2
@@ -219,7 +218,7 @@ I registri LO e HI assumono un contenuto indefinito
 **ATTENZIONE** Il risultato sarà espresso massimo in 32 bit, per la versione a 64 bit guarda [mult](#mult)
 
 ```assembly
-mul <destinazione>, <registro>, <registro/numero>
+mul <Reg>, <Reg>, <Reg/Im>
 
 mul $s0, $t0, $t1
     ;s0 = t0 * t1
@@ -234,7 +233,7 @@ mul $s0, $to, 100
 
 Effettua la moltiplicazione tra due registri, salva le prime 32 cifre in `lo`, e le restanti 32 in `hi`
 ```assembly
-mult <registro>,<registro>
+mult <Reg>,<Reg>
 
 mult $s0, $t0
     ;lo = primi 32 bit
@@ -244,7 +243,7 @@ mult $s0, $t0
 ## mfhi
 *Move From hi* -> Estrae il valore di `hi` e lo inserisce nel registro
 ```assembly
-mfhi <destinazione>
+mfhi <Reg>
 mfhi $s0
     ;s0 = hi
 ```
@@ -253,7 +252,7 @@ mfhi $s0
 ## mflo
 *Move From lo* -> Estrae il valore di `lo` e lo inserisce nel registro
 ```assembly
-mflo <destinazione>
+mflo <Reg>
 
 mflo $s0
     ;s0 = lo
@@ -263,7 +262,7 @@ mflo $s0
 ## mthi
 *Move To hi* -> Setta nel registro `hi` il valore del registro
 ```assembly
-mthi <registro/numero>
+mthi <Reg/Im>
 
 mthi $s0
     ;hi = s0
@@ -274,7 +273,7 @@ mthi 50
 ## mtlo
 *Move To lo* -> Setta nel registro `lo` il valore del registro
 ```assembly
-mtlo <registro/numero>
+mtlo <Reg/Im>
 
 mtlo $s0
     ;lo = s0
@@ -301,7 +300,7 @@ b for_start
 ## Comparazione con lo 0
 hanno sintassi del tipo:
 ```
-comando <registro>, <label>
+comando <Reg>, <label>
 ```
 
 Comando             |  Logicamente         
@@ -321,7 +320,7 @@ bgtz $s0, maggiore_zero
 Comparano due registri tra di loro e vanno alla label se la condizione è vera.
 Hanno sintassi del tipo:
 ```
-comando <registro>, <registro/numero>, <label>
+comando <Reg>, <Reg/Im>, <label>
 ```
 
 Comando             |  Logicamente         
@@ -339,7 +338,7 @@ beq $s1, $s2, label_uguali
 ```
 ## Comparazione tra valori unsigned
 ```
-comando <registro>, <registro/numero>, <label>
+comando <Reg>, <Reg/Im>, <label>
 ```
 
 
@@ -367,16 +366,16 @@ Effettua le operazioni not, or, and, zor, tra un registro e una maschera. La mas
 
 l'ultimo elemento del comando sarà la maschera, (tranne nel not), il secondo elemento sarà il registro dove effettuare l'operazione
 ```assembly
-not <destinazione>, <registro>
+not <Reg>, <Reg>
 
-or <destinazione>, <registro>, <numero/registro> 
-or <destinazione>, <numero>
+or <Reg>, <Reg>, <Reg/Im> 
+or <Reg>, <Im>
 
-and <destinazione>, <registro>, <numero/registro> 
-and <destinazione>, <numero>
+and <Reg>, <Reg>, <Reg/Im> 
+and <Reg>, <Im>
 
-xor <destinazione>, <registro>, <numero/registro> 
-xor <destinazione>, <numero>
+xor <Reg>, <Reg>, <Reg/Im> 
+xor <Reg>, <Im>
 ```
 esempi: 
 ```assembly
@@ -410,7 +409,7 @@ xor $s4, $s4, $s0
 *Shift left logical* -> Sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 Uguale al comando << in C
 ```assembly
-sll <destinazione>, <registro>, <numero>
+sll <Reg>, <Reg>, <Im>
 
     ;s0 = 01011101 (in binario)
 sll $s0, $s0, 3
@@ -421,7 +420,7 @@ sll $s0, $s0, 3
 *Shift right logical* -> Sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
 Uguale al comando >> in C (undefined behaviour)
 ```assembly
-srl <destinazione>, <registro>, <numero>
+srl <Reg>, <Reg>, <Im>
 
     ;s0 = 11011101 (in binario)
 srl $s0, $s0, 3
@@ -432,7 +431,7 @@ srl $s0, $s0, 3
 *Shift right arithmetical* -> Sposta tutti i bit di di un registro di tot posizioni a destra. Tiene conto del segno del numero. i valori aggiunti a sinistra saranno uguali al valore del bit più significativo (quello più a sinistra)
 Uguale al comando >> in C (undefined behaviour) 
 ```assembly
-sra <destinazione>, <registro>, <numero>
+sra <Reg>, <Reg>, <Im>
 
     ;s0 = 10010111 (in binario)
     ;s2 = 2 (in decimale)
@@ -442,8 +441,8 @@ sra $s0, $s0, $s2
 ## rol / ror
 *Rotate left / right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinitra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
-rol <destinazione>, <registro>, <registro/numero>
-ror <destinazione>, <registro>, <registro/numero>
+rol <Reg>, <Reg>, <Reg/Im>
+ror <Reg>, <Reg>, <Reg/Im>
 
     ;s0 = 01000011
 rol $s0, $s0, 2
@@ -562,7 +561,7 @@ Per prelevare un dato dalla memoria e salvarlo in un registro.
 ### lw
 *Load word* -> Preleva la word dall'indirizzo specificato e la salva nel registro. (32 bit, 4 byte).
 ```assembly
-lw <reg>, <adr>
+lw <Reg>, <adr/(Reg)>
 
 lw $s0, 2000
 ```
@@ -572,8 +571,8 @@ lw $s0, 2000
 * `lh` Setta il CCR in base al segno del numero
 * `lhu` Non setta il CCR
 ```assembly
-lh <reg>, <adr>
-lhu <reg>, <adr>
+lh <Reg>, <adr/(Reg)>
+lhu <Reg>, <adr/(Reg)>
 
 lh $s0, 2000
 lhu $s1, 3000
@@ -583,8 +582,8 @@ lhu $s1, 3000
 * `lb` Setta il CCR in base al segno del numero
 * `lbu` Non setta il CCR
 ```assembly
-lb <reg>, <adr>
-lbu <reg>, <adr>
+lb <Reg>, <adr/(Reg)>
+lbu <Reg>, <adr/(Reg)>
 
 lb $s0, 2000
 lbu $s1, 3000
@@ -593,7 +592,7 @@ lbu $s1, 3000
 *Load address* -> Copia l'indirizzo della label nel registro
 
 ```assembly
-la <reg>, <label>
+la <Reg>, <label/(Reg)>
 
 la $s0, unaLabel
 ```
@@ -703,18 +702,18 @@ esempio: (ricorda che è una pila, gli elementi vengono aggiunti dal basso verso
 ```
 Chiamata:
 
-| return address | (SP)
+| return address | <--- SP
 ------------------
 | parameter 2    |
 ------------------
 | parameter 1    |
 
 Ritorno:
-| risultato      | (SP)
+| risultato      | <--- SP
 ``` 
 Naturalmente potrebbe essere non necessario usare lo stack, dipende sempre dall'implementazione dello sviluppatore.
 ## Lettura e scrittura dello stack
-In MIPS non ci sono comandi per gestire lo stack, ma si dovranno usare i `read / store` che si userebbero normalmente per la gestione della memoria. L'unica differenza è che usiamo il registro $sp in mezzo parentesi tonde.
+In MIPS non ci sono comandi per gestire lo stack, ma si dovranno usare i `read / store` che si userebbero normalmente per la gestione della memoria. L'unica differenza è che usiamo il registro `$sp` in mezzo parentesi tonde (perché si utilizza l'indirizzamento indiretto-registro).
 
 Possiamo anche aggiungere un offset che andrà a selezionare N + SP. Non modifica `$sp`
 
@@ -728,10 +727,10 @@ sw     $t0, 4($sp)
 ```
 
 ## Chiamata a funzione e ritorno da funzione
-In mips troviamo un comando che setta il valore di $ra con l'indirizzo della funzione chiamante, e uno che permette di fare un salto all'indirizzo di ritorno.
+In mips troviamo un comando che setta il valore di `$ra` con l'indirizzo successivo a quello della riga di chiamata di funzione, e uno che permette di fare un salto all'indirizzo di ritorno.
 
 ## jal
-`jump and link` -> Setta il valore di $ra con l'indirizzo della funzione chiamante, e poi fa il salto alla label della funzione.
+`jump and link` -> Setta il valore di `$ra` con l'indirizzo successivo a quello della riga di chiamata di funzione, e poi fa il salto alla label della funzione.
 ```assembly
     jal <label>
 ;esempio
@@ -747,3 +746,104 @@ In mips troviamo un comando che setta il valore di $ra con l'indirizzo della fun
 ```
 ## convenzione
 La convenzione di MIPS ci dice che i registri temporanei (t) possono essere usati a piacimento, i registri salvati (s) possono essere usati dalla funzione chiamata, ma dovranno essere ripristinati ai valori iniziali prima di ritornare. Si può usare i registri `v` per i valori di ritorno e `a` per i parametri, oppure usare lo stack se non è una funzione che chiama altre funzioni.
+Esempio di jal e jr
+
+## Esempio funzione
+```assembly
+# i parametri vengono scritti al contrario, quindi primo è num_2, poi num_1
+	.text
+	sub	$sp,$sp,8
+	li	$s0,3
+	sw	$s0,($sp)
+	li	$s0,2
+	sh	$s0,4($sp)
+	jal	somma
+	lw	$s0,($sp)	# preleva il risultato
+	add	$sp,$sp,8	# pop dei parametri
+	b	end
+	
+
+# Routine somma
+# Input
+#	Half in stack frame - parametro num_1
+#	Word in stack frame - parametro num_2
+# Output
+#	Word in stack frame - risultato
+# Registri modificati
+#	$t0, $t1
+# Stack frame
+# Offset | Contenuto    | Note
+# ----------------------------------------------
+#        |              |
+#        |              |
+#   0    | num_2 e      | allocato da chiamante
+#        | risultato    |
+#        |              |
+#   4    | num_1        | allocato da chiamante
+#        |              |
+# ----------------------------------------------
+# dimensione stack frame: 6
+
+.eqv	num_1, 4
+.eqv	num_2, 0
+
+somma:
+	lh	$t1,num_1($sp)
+	lw	$t0,num_2($sp)
+	add	$t0,$t0,$t1
+	sw	$t0,num_2($sp)
+	jr	$ra
+
+end:
+```
+## Esempio funzione ricorsiva
+Funzione originale 
+```c
+int fr(int x) {
+    if (x <= 0) return 0;
+    if (x == 1) return 3;
+    return fr(x / 3) + x;
+}
+```
+
+```assembly
+li $t0, 22
+    sub $sp,$sp,4  
+    sw $t0, ($sp) #add parameter to function call
+    jal fr
+    lw $t0, ($sp)
+    b end
+fr:
+    lw $t0, ($sp) #get parameter of function call
+    bgt $t0, 0, if_grater_than_zero
+    #if (x <= 0) return 0;
+    sw $zero, ($sp)
+    jr $ra
+if_grater_than_zero:
+    #if (x == 1) return 3;
+    bne $t0, 1, if_not_one
+    li $t1, 3
+    sw $t1, ($sp)
+    jr $ra
+if_not_one:
+#   add frame for return address and parameter
+    sub $sp $sp, 8
+    sw $ra, 4($sp) #add return address
+#   int par = x;
+    move $t1, $t0
+#   par /= 3;
+    div $t1, $t1, 3
+    sw $t1, ($sp)  #add parameter
+#   int result = frStack(par);
+    jal fr
+    lw $t1, ($sp)  #return value
+    lw $ra, 4($sp) #return address
+    lw $t2, 8($sp) #x
+#   x += result;
+    add $t2, $t2, $t1
+    add $sp, $sp, 8 #pop of the frame
+    sw $t2, ($sp)
+    jr $ra
+#   return x;
+end:
+```

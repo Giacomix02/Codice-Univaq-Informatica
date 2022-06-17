@@ -305,10 +305,18 @@ tst <An/Dn/(An)/Ea>
 ```
 
 ## cmp [l w b] {w}
-*compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`.
+*compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`. 
+***ATTENZIONE*** In m68K la comparazione è invertita, se facciamo 
+```
+cmp #3,d1
+bgt daQualcheParte
+``` 
+il risultato sarà `d1 > 3`
 ```assembly
 cmp <Im/Dn/(An)/Ea>, <Dn>
     ; comparazione di due valori 
+
+cmp #10,d1
 ```
 ## Comandi di branch
 Una volta settati i valori da comparare, possiamo fare il confronto vero e proprio con i comandi di branch, questi andranno a controllare i dati del CCR e "salteranno" alla label data se la comparazione è vera. Tutti hanno sintassi:
@@ -316,16 +324,28 @@ Una volta settati i valori da comparare, possiamo fare il confronto vero e propr
 comando <label>
 ```
 
-
+tutti gli esempi qui sotto hanno il cmp come:
+```
+cmp a, b
+```
+## Signed
 Comando             |  Logicamente        | Acronimo
 :------------------:|:-------------------:|:------------------------
-beq                 |      a == b         | *Branch equal*   
-bne                 |      a != b         | *Branch not equal*
-blt                 |      a < b          | *Branch less than*
-ble                 |      a <= b         | *Branch less equal*
-bgt                 |      a > b          | *Branch greater than*
-bge                 |      a >= b         | *Branch greater equal*  
-
+beq                 |      b == a         | *Branch equal*   
+bne                 |      b != a         | *Branch not equal*
+blt                 |      b < a          | *Branch less than*
+ble                 |      b <= a         | *Branch less or equal*
+bgt                 |      b > a          | *Branch greater than*
+bge                 |      b >= a         | *Branch greater or equal*  
+## Unsigned
+Comando             |  Logicamente        | Acronimo
+:------------------:|:-------------------:|:------------------------
+beq                 |      b == a         | *Branch equal*   
+bne                 |      b != a         | *Branch not equal*
+blo                 |      b < a          | *Branch lower than*
+bls                 |      b <= a         | *Branch lower than or same*
+bhi                 |      b > a          | *Branch higher than*
+bhs                 |      b >= a         | *Branch than or same* 
 ## Comandi di branch speciali (CCR)
 In oltre ci sono altri comandi di branch "speciali", molti comandi in m68k, una volta eseguiti, comparano il registro destinazione con lo 0, in oltre tengono conto anche del segno del numero, se c'è stato un overflow, etc... Queste informazioni vengono salvate nel CCR, ed oltre ai comandi di branch precedenti, come i precedenti comandi di branch, hanno sintassi: 
 ```assembly
@@ -554,14 +574,24 @@ move.w #1234, unaVariabile
 Naturalmente la lettura e scrittura dipendono dal formato di dato utilizzato.
 
 ## equ
-*equals* -> La direttiva `equ` è usata per assegnare ad un indirizzo di memoria una variabile
+*equals* -> La direttiva `equ` è un alias. Ricorda che l'assembler poi sostituirà il nome di questo nome con il valore indicato.
 
 Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito dall'assembler e sostituito con l'indirizzo di memoria.
 
 ```assembly
-<nome_variabile>  equ  <adr> 
+<nome_variabile>:  equ  <adr/Im> 
 
-unaVariabile equ 5020
+unaVariabile: equ 5020
+unaVariabile: equ $0xFF0022
+
+```
+Esempio:
+```assembly
+unaVariabile: equ 5020
+
+    ORG $1000
+    move.l  #unaVariabile,d0    
+;assemblato in -> move.l  #5020,d0
 ```
 
 # Indirizzi di Memoria e Label
@@ -658,12 +688,12 @@ el3: dc.w     8
 # Stack e funzioni
 Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
 
-in M68K quando una funzione viene chiamata, viene aggiunto automaticamente un frame allo stack che contiene l'indirizzo di ritorno della funzione, in questo modo è facile implementare sia funzioni che non chiamano altre funzioni, che funzioni ricorsive.
+In M68K quando una funzione viene chiamata, viene aggiunto automaticamente un frame allo stack che contiene l'indirizzo successivo a quello della riga di chiamata di funzione, in questo modo è facile implementare sia funzioni che non chiamano altre funzioni, che funzioni ricorsive.
 
 ## Lettura e scrittura dello stack
-Il registro speciale `sp` tiene conto della posizione della cima dello stack. Quando dobbiamo aggiungere informazioni, dobbiamo decrementare il registro `sp` per poi salvare all'indirizzo di `sp`, il dato da memorizzare. Quando invece dobbiamo prelevare un dato o rimuovere un frame, dobbiamo fare l'incremento dello stack pointer.
+Il registro speciale `sp` tiene conto della posizione della cima dello stack. Quando dobbiamo aggiungere informazioni, dobbiamo decrementare il registro `sp` per poi salvare nell'indirizzo puntato da `sp`, il dato da memorizzare. Quando invece dobbiamo prelevare un dato o rimuovere un frame, dobbiamo fare l'incremento dello stack pointer.
 
-M68K ci permette facilmente di aggiungere e rimuovere tramite la sintassi `(sp)` che permette anche di modificare il valore di `sp`.
+M68K ci permette facilmente di aggiungere e rimuovere tramite la sintassi `(sp)` (indirizzamento indiretto-registro) che permette anche di modificare il valore di `sp`.
 
 ## Lettura dello stack, pre decremento, post incremento
 Usa la stessa sintassi della lettura in memoria. ***ATTENZIONE*** Il post/pre incremento/decremento usano il [.l, .w, .b] come quantità di bit da incrementare/decrementare.
@@ -671,59 +701,61 @@ Usa la stessa sintassi della lettura in memoria. ***ATTENZIONE*** Il post/pre in
 Comando  |  Funzione        
 :-------:|:-------------------
 (sp)     |  Seleziona elemento alla cima dello stack
--(sp)    |  Seleziona elemento  alla cima, e poi decremento, usato per aggiungere un dato allo stack
-(sp)+    |  Seleziona elemento alla cima dello stack, e poi incremento, usato per prelevare un dato dallo stack
+-(sp)    |  Decrementa sp prima di eseguire l'istruzione, usato per aggiungere un dato allo stack
+(sp)+    |  Incrementa sp dopo l'esecuzione dell'istruzione, usato per prelevare un dato dallo stack
 N(sp)    | N un numero, legge a posizione sp + N, usato per prelevare i parametri da una funzione
 
 ```assembly
 ; sp = $1000
-; salva 10 alla cima dello stack, poi decrementa sp di 4 (l)
-    move.l 10, -(sp)
-; sp = $1004
+; prima decrementa sp di 4 (l)
+; poi salva il valore 10 nell'indirizzo puntato da sp (cima dello stack)
+    move.l #10, -(sp)
+; sp = $996
 
-; salva 10 alla cima dello stack, poi decrementa sp di 2 (w)
-    move.w 20, -(sp)
-; sp = $1006
+; prima decrementa sp di 2 (w)
+; poi salva il valore 20 nell'indirizzo puntato da sp (cima dello stack)
+    move.w #20, -(sp)
+; sp = $994
 
-; preleva il primo elemento dallo stack, poi incrementa sp di 2 (w)
+; preleva l'elemento nell'indirizzo puntato da sp (cima dello stack), e poi incrementa sp di 2 (w)
     move.w (sp)+, d0
 ; d0 = 20
-; sp = $1004
+; sp = $996
 
-; preleva il primo elemento dallo stack, poi incrementa sp di 4 (l)
+; preleva l'elemento nell'indirizzo puntato da sp (cima dello stack), poi incrementa sp di 4 (l)
     move.l (sp)+, d1
 ; d1 = 10
 ; sp = $1000
 
-; salva 1000 a posizione sp + 4, non modifica sp
-    move.l 1000, 4(sp)
+; salva il valore 1000 nell'indirizzo sp + 4, non modifica sp
+    move.l #1000, 4(sp)
 ```
-Naturalmente l'offset può anche essere un alias dato da `equ`, per esempio si può usare 
+L'offset può anche essere un alias dato da `equ`, per esempio si può usare 
 ```assembly
-parametro_1: equ $0
-parametro_2: equ $4
+parametro_1: equ 0
+parametro_2: equ 4
 
-move.l parametro_1(sp), d0
-move.l parametro_2(sp), d1
+move.l parametro_1(sp), d0  ; move.l 0($sp), d0
+move.l parametro_2(sp), d1  ; move.l 4($sp), d1
 ```
-## Chiamata a funzione e ritorno da funzione
-Quando chiamiamo una funzione, M68K automaticamente gestisce l'aggiunta del frame dove è contenuto l'indirizzo di ritorno, e nel ritorno, rimuove il frame.
+## bsr - Chiamata a funzione
 
-## bsr
-Il comando `bsr` aggiunge un frame allo stack che contiene l'indirizzo di ritorno e decrementa lo `sp` di 4 byte. Poi effettua il salto alla label specificata. 
+Il comando `bsr` decrementa lo `sp` di 4 byte (gli indirizzi in M68K hanno dimensione long) per poi aggiungere l'indirizzo di ritorno nello spazio liberato. In seguito effettua il salto alla label specificata. 
 ```assembly
 bsr <label>
 
-bsr una_funzione
+; esempio
+    bsr una_funzione
 ```
-## rts
-Il comando `rts` prende l'ultimo elemento dello stack che verrà usato per l'indirizzo di ritorno, poi incrementa lo `sp` di 4 byte.
+## rts - Ritorno da funzione
+Il comando `rts` utilizza l'elemento dello stack puntato da `sp` come indirizzo di ritorno alla funzione chiamante. Una volta eseguito il pop, incrementa `sp` di 4 byte (gli indirizzi in M68K hanno dimensione long).
 ```
 rts
 ```
 Esempio di bsr e rts
 ```assembly
 ; i parametri vengono scritti al contrario, quindi primo è num_2, poi num_1
+    ORG $1000
     move.l #3, -(sp) ; push di num_2 
     move.w #2, -(sp) ; push di num_1
     sub.l #4, sp     ; riserva spazio per il risultato
@@ -731,21 +763,40 @@ Esempio di bsr e rts
     move.l (sp)+, d0 ; preleva il risultato
     add.l #6, sp     ;pop dei parametri
     bra end
-; | indirizzo |
-; -------------
-; | risultato |
-; -------------
-; | num_1     |
-; -------------
-; | num_2     |    
+
+
+* Routine somma
+; Input
+;	Word in stack frame - parametro num_1
+;	Long in stack frame - parametro num_2
+; Output
+;	Long in stack frame - risultato
+; Registri modificati
+;	d0 (word), d1 (long)
+; Stack frame
+; Offset | Contenuto    | Note
+; ----------------------------------------------
+;        |              |
+;        |              |
+;   0    | pc di ritorno| allocato da chiamante
+;        |              |
+;   4    | risultato    | allocato da chiamante
+;        |              |
+;   8    | num_1        | allocato da chiamante
+;        |              |
+;  10    | num_2        | allocato da chiamante
+;        |              |
+; ----------------------------------------------
+; dimensione stack frame: 14
+
 risultato: equ 4
-par_1: equ 8
-par_2: equ 10
+num_1: equ 8
+num_2: equ 10
 
 somma:
-    move.w par_1(sp), d1 ; num_1  
-    move.l par_2(sp), d0 ; num_2
-    add.l d0, d1         ; d1 = num_2 + num_1
-    move.l d1, risultato(sp) ; salva risultato
+    move.w num_1(sp), d1 ; d1 = num_1
+    move.l num_2(sp), d0 ; d0 = num_2
+    add.l d1, d0         ; d0 = num_2 + num_1
+    move.l d0, risultato(sp) ; salva risultato
     rts
 ```
