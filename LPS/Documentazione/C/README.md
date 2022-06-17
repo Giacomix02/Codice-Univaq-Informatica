@@ -52,7 +52,12 @@ int s;
 scanf("%d", &s);
 // inserisce un valore intero in s
 ```
-
+## sizeof
+Ritorna la grandezza dell'elemento passato in input
+```c
+char n = sizeof(int); // 4
+int n2 = sizeof(n); // 1
+```
 ## if
 
 ```c

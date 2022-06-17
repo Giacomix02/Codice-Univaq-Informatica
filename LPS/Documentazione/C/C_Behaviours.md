@@ -414,6 +414,45 @@ accedere al valore) il POPLEL di un array
             scrive 1 nell’elemento OPLE 
             (deferenzia il POPLEL) */
 ```
+## Conversioni
+* conversioni dirette da un tipo intero a un tipo intero con segno
+```C
+/*
+È undefined behavior se il valore da
+convertire non è rappresentabile mediante
+il tipo intero con segno
+*/
+
+    unsigned long long x = 11111987654321;
+    signed int y;
+
+    y = x;  // undefined behavior
+```
+* conversioni dirette da un tipo float a un tipo intero diverso da `_Bool`
+```C
+/*
+È undefined behavior se il valore (privo
+della parte frazionaria) da convertire
+non è rappresentabile mediante
+il tipo intero
+*/
+
+    float x = 1111198.32;
+    short int y;
+
+    y = x;  // undefined behavior
+```
+* conversioni dirette da un tipo aritmetico a un tipo float
+```C
+/*
+È undefined behavior se il valore da convertire non è rappresentabile mediante
+il tipo float
+*/
+
+    float x = 1111198.32 / 3213123072; // undefined behavior
+    //valore che dovrebbe risultare 0,034583
+    //valore effettivo in c 0.000346
+```
 # Esempi implementation defined behavior
 ## Puntatori
 * conversione tra puntatori e valori interi
