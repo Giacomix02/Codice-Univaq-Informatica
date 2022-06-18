@@ -31,11 +31,13 @@ include <stdio.h>
 
 ## printf
 
-| Tipo dato  | Codice |
-| ---------- | :----: |
-| double,int | **%d** |
-| float      | **%f** |
-| exadecimal | **%x** |
+| Tipo dato   | Codice |
+| ----------  | :----: |
+| int signed  | **%d** |
+| int unsigned| **%u** |
+| float       | **%f** |  
+| double      | **%lf**|
+| exadecimal  | **%x** |
 
 ```c
 int n = 10;
@@ -43,10 +45,43 @@ printf("numero = %d", n);
 // stampa a schermo "numero = 10"
 ```
 
+Con printf si può anche specificare lo spazio minimo occupato da un numero e la lunghezza della parte dopo la virgola da visualizzare:
+```c
+int i = 10;
+float n = 10.1234;
+printf ("numero = |%5d|", i);
+// stampa a schermo "numero = |   10|"
+//        spazio di 3 caratteri ^
+
+printf ("numero = |%-5d|", i);
+// stampa a schermo "numero = |10   |"
+
+printf ("numero = |%.2f|", n);
+// stampa a schermo "numero = |10.12|"
+
+
+```
+
 ## scanf
 
 **ATTENZIONE** Lo `scanf` richiede l'inserimento del puntatore `&` prima della variabile in cui si vuole salvare il valore inserito
 
+È molto importante fare attenzione alla specifica del tipo per ogni valore che si prende in input, un tipo sbagliato assegnato ad un valore può formattarlo in modi imprevisti e causare undefined behavior
+| Tipo dato                  | Codice  |
+| ----------                 | :----:  |
+| int signed                 | **%d**  |
+| int unsigned               | **%u**  |
+| short signed               | **%hd** |
+| short unsigned             | **%hu** |
+| char signed (come numero)  | **%hhd**|
+| char unsigned (come numero)| **%hhu**|
+| char                       | **%c**  |
+| string (array di char)     | **%s**  |
+| float                      | **%f**  |  
+| double                     | **%lf** |
+| exadecimal                 | **%x**  |
+
+sono stati omessi tipi che vengono usati raramente, per saperne di più consultare le tabelle [qui](https://cplusplus.com/reference/cstdio/scanf/)
 ```c
 int s;
 scanf("%d", &s);
