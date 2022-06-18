@@ -82,7 +82,13 @@ An -> <a1/a2/a3/a4/a5/a6/a7>
 ```assembly
     move.l (a0), d0
 ```
-
+Utile anche sapere il `base indicizzato`, che usa due registri, uno che specifica l'inizio nella memoria, e uno che specifica l'offset.
+```assembly
+    move.l #1000, a0
+    move.l $5, d0
+; setta 10 ad indirizzo 1005
+    move.l #10, (a0, d0)
+```
 ## Implicito
 In questa documentazione non trattiamo casi di indirizzamento implicito.
 
@@ -728,14 +734,21 @@ el2: dc.w     3
 el3: dc.w     8
 ```
 ## ds [l w b]
-Simile a dc, ma dichiara uno spazio di memoria di grandezza fissa data dal numero di elementi moltiplicato dal tipo di selettore [l w b] che scegliamo. Molto utile per creare array di N elementi.
+Simile a dc, ma dichiara uno spazio di memoria di grandezza fissa data dal numero di elementi moltiplicato dal tipo di selettore [l w b] che scegliamo. Molto utile per creare array di N elementi. Il contenuto di questo spazio di memoria non è definito.
 ```
 <label>: ds <numero_elementi>
 
 ;esempio, array di 10 elementi long
 array: ds.l 10
 ```
+## dcb [l w b]
+Simile a `ds` ma ci permette di mettere un valore di default in ogni segmento della memoria.
+```
+<label>: dcb <numero_elementi>,<valore_iniziale>
 
+;esempio, array di 10 elementi long con valore di default 0
+array: dcb.l 10, 0
+```
 
 # Stack e funzioni
 Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
