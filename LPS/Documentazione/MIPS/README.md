@@ -689,7 +689,14 @@ lb	    $t0,($t1)    ; copia in $t0 il valore unArray[id1]
 mul	    $t0,$t0,3    ; effettua la moltiplicazione
 sb	    $t0,array1+5 ; copia il risultato in unArray[5]
 ```
+## Array di N elementi
+Possiamo usare array di N elementi usando la direttiva `.space`
+```
+<label>: .space <dimensione in byte>
 
+;esempio array di 1000 long
+array: .space 4000
+```
 
 ## Stack e funzioni
 Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 

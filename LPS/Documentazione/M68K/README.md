@@ -727,6 +727,16 @@ el1: dc.w     0
 el2: dc.w     3
 el3: dc.w     8
 ```
+## ds [l w b]
+Simile a dc, ma dichiara uno spazio di memoria di grandezza fissa data dal numero di elementi moltiplicato dal tipo di selettore [l w b] che scegliamo. Molto utile per creare array di N elementi.
+```
+<label>: ds <numero_elementi>
+
+;esempio, array di 10 elementi long
+array: ds.l 10
+```
+
+
 # Stack e funzioni
 Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
 
