@@ -106,9 +106,10 @@ if (condizione) {
 
 if(!condizione) goto if_false;
     //codice se vero
-    goto if_false;
+    goto if_end;
 if_false:
     //codice se falso
+if_end:
 ```
 
 ## Operatore ternario
@@ -197,7 +198,7 @@ while_true:
 
 # Tipi enumerativi
 
-Sono utilizzati per creare degli alias a valori, sono utili per gestire le "tipologie" di cose all'intenro del programma. Possiamo anche dare valori di default, oppure mischiare i due
+Sono utilizzati per creare degli alias a valori, sono utili per gestire le "tipologie" di cose all'interno del programma. Possiamo anche dare valori di default, oppure mischiare i due
 
 ```c
 typedef enum {
@@ -209,7 +210,7 @@ typedef enum {
 
 # struct
 
-Usato per raggruppare più valori in una singola variabile, "simile" agli oggetti in Java, ma senza metodi. Naturalmente I tipi possono essere diversi.
+Usato per raggruppare più valori in una singola variabile, "simile" agli oggetti in Java, ma senza metodi. Naturalmente I tipi possono essere diversi. Da ricordare che a meno che si usi la malloc, il dato creato si troverà nello stack
 **_Dichiarazione_**
 
 ```c
@@ -253,7 +254,6 @@ Le union sono simili agli struct, ma hanno la differenza che, al suo interno, è
 union nome{
     //parametri
 }
-```c
 //Esempio:
 
 typedef union {
@@ -326,7 +326,7 @@ int *p = &x;
 ```
 
 ## operatore freccia
-Quando abbiamo, per esempio, un puntatore all'interno di uno struct, e dobbiamo settarne il valore, dovremmo fare
+Quando abbiamo, per esempio, un puntatore ad uno struct e dobbiamo settarne un campo, possiamo usare l'operatore `->`
 ```c
 typedef struct {
     int x;
@@ -340,11 +340,11 @@ Punto *puntatore = &p;
 ```
 c'è un modo più veloce di scrivere ciò ed è quello di usare l'operatore freccia. `->`
 ```c
-    puntatore->x = 15;
-    printf("%d", puntatore->x);
+puntatore->x = 15;
+printf("%d", puntatore->x);
 ```
 ## NULL pointer
-Il null pointer è un puntatore speciale che viene tipicamente usato per specificare che un puntatore non punta ancora a nulla. Dobbiamo fare attenzione a non usare un puntatore nullo, in quanto questo può causare errori. Utilizzare un puntatore che è nullo genera un errore durante l'esecuzione del programma.
+Il null pointer è un puntatore speciale che viene tipicamente usato per specificare che un puntatore non punta ancora a nulla. Dobbiamo fare attenzione a non deferenziare un puntatore nullo, in quanto questo può causare errori.
 
 ```c
 int *p = NULL;
@@ -352,7 +352,7 @@ int *p = NULL;
 int x = *p; //ERRORE
 ```
 ## void pointer
-Un void pointer è un puntatore ad un tipo non specificato. è utile per creare cose "generice", un esempio in seguito sarà la `malloc`.
+Un void pointer è un puntatore ad un tipo non specificato. è utile per creare cose "generiche", un esempio in seguito sarà la `malloc`.
 ***ATTENZIONE*** NON è possibile fare aritmetica dei puntatori con i void pointer. è una constraint violation di C.
 
 ## Aritmetica dei puntatori
@@ -531,12 +531,12 @@ qualcosa(6); //-1
 Prendiamo questo esempio:
 ```c
 typedef struct {
-    int *voti[3];
+    int *voti;
     int id;
 } Studente;
-Studente creaStudente(int id){
-    int *voti[3] = {0,0,0};
-    Studente studente = {voti, id};
+Studente creaStudente(int id) {
+    int voti[3] = { 0,0,0 };
+    Studente studente = { voti, id };
     return studente;
 }
 ```
@@ -548,7 +548,7 @@ Ritorna un puntatore ad un blocco di memoria di dimensione uguale al parametro p
    Tipo *puntatore = (tipo *) malloc(dimensione);
 
     // alloca un blocco di memoria che riesce a contenere un array di 3 elementi di tipo int
-   int *voti[] = (int *) malloc(sizeof(int) * 3); 
+   int *voti = (int*) malloc(sizeof(int) * 3);
 ```
 ***ATTENZIONE*** Utilizzando malloc, il valore degli elementi all'interno non è azzerato.
 ***ATTENZIONEV2*** Potrebbe accadere che la memoria non sia sufficiente per allocare l'array. In questo caso, la funzione restituisce NULL.
@@ -561,9 +561,9 @@ La funzione `free` ha l'effetto contrario, libera la sezione di memoria allocato
 ## calloc
 La funzione `calloc` accetta due parametri, il numero di elementi e la grandezza di ogni elemento. in oltre, azzera la memoria allocata.
 ```c
-    Tipo *puntatore = (tipo *) calloc(numeroElementi, dimensioneElemento);
+    Tipo *puntatore = (Tipo *) calloc(numeroElementi, dimensioneElemento);
 
-    int *voti[] = (int *) calloc(3, sizeof(int));
+    int *voti = (int *) calloc(3, sizeof(int));
     int *studente = (studente *) calloc(1, sizeof(studente));
 ```
 ## realloc 
@@ -572,7 +572,7 @@ Incrementa la dimensione di un certo blocco di memoria, usato spesso per gli arr
     Tipo *nuovoPuntatore = (tipo *) realloc(vecchioPuntatore, nuovaDimensione);
 
     //array di 3 elementi
-    int *voti[] = (int *) malloc(sizeof(int) * 3);
+    int *voti = (int *) malloc(sizeof(int) * 3);
     //array di 5 elementi 
     voti = (int *) realloc(voti, sizeof(int) * 5);
 ```
