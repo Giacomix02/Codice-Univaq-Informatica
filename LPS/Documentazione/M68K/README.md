@@ -318,6 +318,7 @@ tst <An/Dn/(An)/Ea>
 
 ## cmp [l w b] {w}
 *compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`. 
+
 ***ATTENZIONE*** In m68K viene confrontato il secondo operando con il primo. Se facciamo 
 ```
 cmp #3,d1
