@@ -82,7 +82,13 @@ An -> <a1/a2/a3/a4/a5/a6/a7>
 ```assembly
     move.l (a0), d0
 ```
-
+Utile anche sapere il `base indicizzato`, che usa due registri, uno che specifica l'inizio nella memoria, e uno che specifica l'offset.
+```assembly
+    move.l #1000, a0
+    move.l $5, d0
+; setta 10 ad indirizzo 1005
+    move.l #10, (a0, d0)
+```
 ## Implicito
 In questa documentazione non trattiamo casi di indirizzamento implicito.
 
@@ -235,7 +241,7 @@ swap d0
     ;dopo:  d0 = 0xFFFF0000
 ```
 
-## clr [ ]
+## clr [l w b]
 *clear* -> Azzera il contenuto del registro messo dopo il comando
 ```assembly
 clr <Dn/(An)>
@@ -243,6 +249,12 @@ clr <Dn/(An)>
     ;prima: d0 = 0x01495840
 clr d0
     ;dopo:  d0 = 0x00000000
+
+;oppure
+
+;prima: d0 = 0x01495840
+clr.w d0
+;dopo:  d0 = 0x01490000 
 ```
 
 
@@ -305,10 +317,19 @@ tst <An/Dn/(An)/Ea>
 ```
 
 ## cmp [l w b] {w}
-*compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`.
+*compare* -> Se il secondo operando è un registro indirizzi (a) allora ha formato `long`. 
+
+***ATTENZIONE*** In m68K viene confrontato il secondo operando con il primo. Se facciamo 
+```
+cmp #3,d1
+bgt daQualcheParte
+``` 
+verrà confrontato d1 con 3.
 ```assembly
 cmp <Im/Dn/(An)/Ea>, <Dn>
     ; comparazione di due valori 
+
+cmp #10,d1
 ```
 ## Comandi di branch
 Una volta settati i valori da comparare, possiamo fare il confronto vero e proprio con i comandi di branch, questi andranno a controllare i dati del CCR e "salteranno" alla label data se la comparazione è vera. Tutti hanno sintassi:
@@ -316,16 +337,28 @@ Una volta settati i valori da comparare, possiamo fare il confronto vero e propr
 comando <label>
 ```
 
-
+tutti gli esempi qui sotto hanno il cmp come:
+```
+cmp a, b
+```
+## Signed
 Comando             |  Logicamente        | Acronimo
 :------------------:|:-------------------:|:------------------------
-beq                 |      a == b         | *Branch equal*   
-bne                 |      a != b         | *Branch not equal*
-blt                 |      a < b          | *Branch less than*
-ble                 |      a <= b         | *Branch less equal*
-bgt                 |      a > b          | *Branch greater than*
-bge                 |      a >= b         | *Branch greater equal*  
-
+beq                 |      b == a         | *Branch equal*   
+bne                 |      b != a         | *Branch not equal*
+blt                 |      b < a          | *Branch less than*
+ble                 |      b <= a         | *Branch less or equal*
+bgt                 |      b > a          | *Branch greater than*
+bge                 |      b >= a         | *Branch greater or equal*  
+## Unsigned
+Comando             |  Logicamente        | Acronimo
+:------------------:|:-------------------:|:------------------------
+beq                 |      b == a         | *Branch equal*   
+bne                 |      b != a         | *Branch not equal*
+blo                 |      b < a          | *Branch lower than*
+bls                 |      b <= a         | *Branch lower than or same*
+bhi                 |      b > a          | *Branch higher than*
+bhs                 |      b >= a         | *Branch than or same* 
 ## Comandi di branch speciali (CCR)
 In oltre ci sono altri comandi di branch "speciali", molti comandi in m68k, una volta eseguiti, comparano il registro destinazione con lo 0, in oltre tengono conto anche del segno del numero, se c'è stato un overflow, etc... Queste informazioni vengono salvate nel CCR, ed oltre ai comandi di branch precedenti, come i precedenti comandi di branch, hanno sintassi: 
 ```assembly
@@ -334,10 +367,10 @@ comando <label>
 e sono:
 * `bmi` se un valore è negativo
 * `bpl` se un valore è positivo
-* `bcs` se dopo aver fatto un operazione aritmetica su numeri unsigned, se c'è stato riporto nella cifra più a sinistra (più significativa), per esempio, prendendo un byte per numero, si fa `255 + 9`, il risultato sarà `8`, perchè `264` è più grande del numero massimo rappresentabile da un byte, che è 255, se ciò è accaduto, allora si dice che c'è stato **riporto**. vale anche se un numero va da positivo a negativo, es: 1-3 sarà 254. 
-* `bcc` come bcs, ma se **NON** c'è stato riporto
-* `bvc` come bcc, ma con numeri signed
-* `bvs` come bcs, ma con numeri signed
+* `bcs` (Branch Carry Set) se dopo aver fatto un operazione aritmetica su numeri unsigned, se c'è stato riporto nella cifra più a sinistra (più significativa), per esempio, prendendo un byte per numero, si fa `255 + 9`, il risultato sarà `8`, perchè `264` è più grande del numero massimo rappresentabile da un byte, che è 255, se ciò è accaduto, allora si dice che c'è stato **riporto**. vale anche se un numero va da positivo a negativo, es: 1-3 sarà 254. 
+* `bcc` (Branch Carry Clear) come `bcs`, ma se **NON** c'è stato riporto
+* `bvs` (Branch oVerflow Set) se dopo aver fatto una operazione aritmetica, viene causato un overflow (per esempio: se venissero sommati 2 numeri positivi signed, e ne uscisse come risultato un numero negativo, è Overflow)
+* `bvc` (Branch oVerflow Clear) come `bvs`, ma **NON** c'è stato Overflow
 
 
 ## Branch incondizionato
@@ -351,20 +384,20 @@ Come visto prima nei branch, nel CCR troviamo varie informazioni durante l'esecu
 ```assembly
 comando <destinazione>
 ```
-* `scc` se non c'è stato riporto (carry clear)
-* `scs` se c'è stato riporto (carry set)
-* `seq` se è uguale (equal)
-* `sne` se non è uguale (not equal)
-* `sge` se è maggiore uguale (greater or equal) **SIGNED**
-* `sgt` se è maggiore (greater) **SIGNED**
-* `sle` se è minore uguale (less or equal) **SIGNED**
-* `sls` se è più piccolo o uguale (lower) **UNSIGNED**
-* `slt` se è minore (less) **SIGNED**
-* `shi` se è più grande (higher) **UNSIGNED**
-* `smi` se è negativo (minus)
-* `spl` se è positivo (positive)
-* `svc` se non c'è stato overflow (overflow clear)
-* `svs` se c'è stato overflow (overflow set)
+* `scc` se non c'è stato riporto (Carry Clear)
+* `scs` se c'è stato riporto (Carry Set)
+* `seq` se è uguale (EQual)
+* `sne` se non è uguale (Not Equal)
+* `sge` se è maggiore uguale (Greater or Equal) **SIGNED**
+* `sgt` se è maggiore (Greater) **SIGNED**
+* `sle` se è minore uguale (Less or Equal) **SIGNED**
+* `sls` se è più piccolo o uguale (LOwer) **UNSIGNED**
+* `slt` se è minore (Less Than) **SIGNED**
+* `shi` se è più grande (HIgher) **UNSIGNED**
+* `smi` se è negativo (MInus)
+* `spl` se è positivo (Positive)
+* `svc` se non c'è stato overflow (oVerflow Clear)
+* `svs` se c'è stato overflow (oVerflow Set)
 * `sf`  se è falso (false)
 * `st`  se è vero (true)
 
@@ -372,12 +405,12 @@ comando <destinazione>
 # Operazioni sui bit e logici
 Le operazioni sui bit ci permettono di effettuare modifiche ai singoli bit di un registro, come spostarli a sinistra/destra, invertirli, etc...
 
-## not, or, and, xor
+## not, or, and, eor
 Effettua le operazioni not, or, and, xor, tra un registro e una maschera. La maschera è una sequenza di bit che specificano a quali posizioni si deve effettuare l'operazione logica. I vari operatori hanno funzioni equiparabili a:
 * `NOT` Inverso di tutti i bit (1 diventa 0, 0 diventa 1), non usa una maschera
 * `OR`  Setta ad 1 i bit alle posizioni della maschera, senza modificare gli altri
 * `AND` Prelevare i bit alle posizioni della maschera, oppure controllare se un bit è segnato ad 1 nella posizione segnata nella maschera
-* `XOR` Inverso dei bit alle posizioni della maschera.
+* `EOR` Inverso dei bit alle posizioni della maschera.
 
 il primo elemento del comando sarà la maschera, (tranne nel not), il secondo elemento sarà il registro dove effettuare l'operazione, e dove verrà salvata
 ```assembly
@@ -413,7 +446,7 @@ eor d0, d4
     ; d4 = 10101011
 ```
 
-## lsl 
+## lsl [l w b] {w}
 *logical shift left* -> Sposta tutti i bit di di un registro di tot posizioni a sinistra, le cifre aggiunte saranno uguali a 0.
 
 Uguale al comando `<<` in C
@@ -428,12 +461,21 @@ lsl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d2 = 3 (in decimale)
 lsl d2, d0
     ;d0 = 11101000
+
+;più un grande:
+
+    ;d0 = 87658765 (in esadecimale) 
+lsl #4, d0
+    ;d0 = 87657650 (la word a sinistra non è stata shiftata) 
+
+lsl.l #5, d0
+    ;d0 = ECAECA00 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Lo `shift sinistro` logico ha lo scopo aritmetico di effettuare `(N * 2^k) mod 2^l` dove N = numero dove effettuare lo shift, k è il numero di bit da spostare a sinistra, e l è il numero di bit nel formato usato.
 
 
-## lsr 
+## lsr [l w b] {w}
 *logical shift right* -> Sposta tutti i bit di di un registro di tot posizioni a destra, le cifre aggiunte saranno uguali a 0. Ignora il segno del numero, quindi un numero negativo verrà trattato ugualmente ad uno positivo. 
  
 Uguale al comando `>>` in C
@@ -445,12 +487,21 @@ lsr <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d2 = 3 (in decimale)
 lsr d2, d0
     ;d0 = 00011011
+
+;più un grande:
+
+    ;d0 = 87658765 (in esadecimale) = 10000111011001011000011101100101
+lsr #4, d0
+    ;d0 = 87650876 (la word a sinistra non è stata shiftata)
+
+lsr.l #5, d0
+    ;d0 = 043B2843 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Lo `shift destro` logico è uguale a calcolare `N/2^k` dove N è il numero dove effettuare lo shift e `k` è la quantità dello shift, oppure semplicemente, ogni volta che spostiamo di una posizione, il numero viene diviso per 2.
 
 
-## asr / asl 
+## asr / asl [l w b] {w}
 *arithmetical shift right/left* -> Sposta tutti i bit di di un registro di tot posizioni a destra/sinistra. Tiene conto del segno del numero. Se verso destra, i numeri aggiunti saranno uguali al numero più a sinistra, se verso sinistra, il segno verrà ignorato, ma se c'è un cambio di segno, verrà segnato sul CCR
 
 ```assembly
@@ -464,6 +515,15 @@ asl <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 asr d2, d0
 
     ;d0 = 11100101
+
+;più in grande:
+
+    ;d0 = 87658765 (in esadecimale)
+asr #4, d0
+    ;d0 = 8765F876 (la word a sinistra non è stata shiftata)
+
+asr.l #5, d0
+    ;d0 = FC3B2FC3 (stavolta con .l l'intero valore è stato shiftato)
 ```
 
 Aritmeticamente, lo  `shift sinistro` aritmetico è uguale a calcolare `N*2^k` dove N è il numero dove effettuare lo shift e `k` è la quantità dello shift, oppure semplicemente, ogni volta che spostiamo di una posizione, il numero viene moltiplicato per 2. 
@@ -473,7 +533,7 @@ Mentre per lo `shift destro` aritmetico è uguale a calcolare `N/2^k` dove N è 
 
 Bisogna fare attenzione nel caso che il numero sia negativo, o se il numero è grande, visto che potrebbe andare in overflow.
 
-## rol / ror
+## rol / ror [l w b] {w}
 *rotate left / rotate right* -> Prendendo per esempio la rotazione a destra, il comando sposterà a destra di un tot numero di bit, e li posizionerà a sinistra (al posto dei bit da aggiungere). Lo stesso vale per rol, ma verso sinistra
 ```assembly
 rol <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
@@ -482,6 +542,15 @@ ror <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
     ;d0 = 01000011
 rol #2, d0
     ;d0 = 11010000
+
+;più in grande:
+
+    ;d0 = 87658765 (in esadecimale)
+rol #4, d0
+    ;d0 = 87657658 (la word a sinistra non è stata ruotata)
+
+rol.l #5, d0
+    ;d0 = ECAECB10 (stavolta con .l l'intero valore è stato ruotato)
 ```
 
 # Operazioni sui singoli bit
@@ -554,14 +623,24 @@ move.w #1234, unaVariabile
 Naturalmente la lettura e scrittura dipendono dal formato di dato utilizzato.
 
 ## equ
-*equals* -> La direttiva `equ` è usata per assegnare ad un indirizzo di memoria una variabile
+*equals* -> La direttiva `equ` è un alias. Ricorda che l'assembler poi sostituirà il nome di questo nome con il valore indicato.
 
 Deve essere messo prima di `ORG $2000` e senza indentazione. Verrà convertito dall'assembler e sostituito con l'indirizzo di memoria.
 
 ```assembly
-<nome_variabile>  equ  <adr> 
+<nome_variabile>:  equ  <adr/Im> 
 
-unaVariabile equ 5020
+unaVariabile: equ 5020
+unaVariabile: equ $0xFF0022
+
+```
+Esempio:
+```assembly
+unaVariabile: equ 5020
+
+    ORG $1000
+    move.l  #unaVariabile,d0    
+;assemblato in -> move.l  #5020,d0
 ```
 
 # Indirizzi di Memoria e Label
@@ -655,5 +734,135 @@ el1: dc.w     0
 el2: dc.w     3
 el3: dc.w     8
 ```
+## ds [l w b]
+Simile a dc, ma dichiara uno spazio di memoria di grandezza fissa data dal numero di elementi moltiplicato dal tipo di selettore [l w b] che scegliamo. Molto utile per creare array di N elementi. Il contenuto di questo spazio di memoria non è definito.
+```
+<label>: ds <numero_elementi>
+
+;esempio, array di 10 elementi long
+array: ds.l 10
+```
+## dcb [l w b]
+Simile a `ds` ma ci permette di mettere un valore di default in ogni segmento della memoria.
+```
+<label>: dcb <numero_elementi>,<valore_iniziale>
+
+;esempio, array di 10 elementi long con valore di default 0
+array: dcb.l 10, 0
+```
+
+# Stack e funzioni
+Nei linguaggi assembly, per implementare le funzioni, si deve usare e gestire lo stack. Lo stack è una pila di frame che contengono i vari dati necessari per l'esecuzione di una funzione. 
+
+In M68K quando una funzione viene chiamata, viene aggiunto automaticamente un frame allo stack che contiene l'indirizzo successivo a quello della riga di chiamata di funzione, in questo modo è facile implementare sia funzioni che non chiamano altre funzioni, che funzioni ricorsive.
+
+## Lettura e scrittura dello stack
+Il registro speciale `sp` tiene conto della posizione della cima dello stack. Quando dobbiamo aggiungere informazioni, dobbiamo decrementare il registro `sp` per poi salvare nell'indirizzo puntato da `sp`, il dato da memorizzare. Quando invece dobbiamo prelevare un dato o rimuovere un frame, dobbiamo fare l'incremento dello stack pointer.
+
+M68K ci permette facilmente di aggiungere e rimuovere tramite la sintassi `(sp)` (indirizzamento indiretto-registro) che permette anche di modificare il valore di `sp`.
+
+## Lettura dello stack, pre decremento, post incremento
+Usa la stessa sintassi della lettura in memoria. ***ATTENZIONE*** Il post/pre incremento/decremento usano il [.l, .w, .b] come quantità di bit da incrementare/decrementare.
+
+Comando  |  Funzione        
+:-------:|:-------------------
+(sp)     |  Seleziona elemento alla cima dello stack
+-(sp)    |  Decrementa sp prima di eseguire l'istruzione, usato per aggiungere un dato allo stack
+(sp)+    |  Incrementa sp dopo l'esecuzione dell'istruzione, usato per prelevare un dato dallo stack
+N(sp)    | N un numero, legge a posizione sp + N, usato per prelevare i parametri da una funzione
+
+```assembly
+; sp = $1000
+; prima decrementa sp di 4 (l)
+; poi salva il valore 10 nell'indirizzo puntato da sp (cima dello stack)
+    move.l #10, -(sp)
+; sp = $996
+
+; prima decrementa sp di 2 (w)
+; poi salva il valore 20 nell'indirizzo puntato da sp (cima dello stack)
+    move.w #20, -(sp)
+; sp = $994
+
+; preleva l'elemento nell'indirizzo puntato da sp (cima dello stack), e poi incrementa sp di 2 (w)
+    move.w (sp)+, d0
+; d0 = 20
+; sp = $996
+
+; preleva l'elemento nell'indirizzo puntato da sp (cima dello stack), poi incrementa sp di 4 (l)
+    move.l (sp)+, d1
+; d1 = 10
+; sp = $1000
+
+; salva il valore 1000 nell'indirizzo sp + 4, non modifica sp
+    move.l #1000, 4(sp)
+```
+L'offset può anche essere un alias dato da `equ`, per esempio si può usare 
+```assembly
+parametro_1: equ 0
+parametro_2: equ 4
+
+move.l parametro_1(sp), d0  ; move.l 0($sp), d0
+move.l parametro_2(sp), d1  ; move.l 4($sp), d1
+```
+## bsr - Chiamata a funzione
+
+Il comando `bsr` decrementa lo `sp` di 4 byte (gli indirizzi in M68K hanno dimensione long) per poi aggiungere l'indirizzo di ritorno nello spazio liberato. In seguito effettua il salto alla label specificata. 
+```assembly
+bsr <label>
+
+; esempio
+    bsr una_funzione
+```
+## rts - Ritorno da funzione
+Il comando `rts` utilizza l'elemento dello stack puntato da `sp` come indirizzo di ritorno alla funzione chiamante. Una volta eseguito il pop, incrementa `sp` di 4 byte (gli indirizzi in M68K hanno dimensione long).
+```
+rts
+```
+Esempio di bsr e rts
+```assembly
+; i parametri vengono scritti al contrario, quindi primo è num_2, poi num_1
+    ORG $1000
+    move.l #3, -(sp) ; push di num_2 
+    move.w #2, -(sp) ; push di num_1
+    sub.l #4, sp     ; riserva spazio per il risultato
+    bsr somma
+    move.l (sp)+, d0 ; preleva il risultato
+    add.l #6, sp     ;pop dei parametri
+    bra end
 
 
+* Routine somma
+; Input
+;	Word in stack frame - parametro num_1
+;	Long in stack frame - parametro num_2
+; Output
+;	Long in stack frame - risultato
+; Registri modificati
+;	d0 (word), d1 (long)
+; Stack frame
+; Offset | Contenuto    | Note
+; ----------------------------------------------
+;        |              |
+;        |              |
+;   0    | pc di ritorno| allocato da chiamante
+;        |              |
+;   4    | risultato    | allocato da chiamante
+;        |              |
+;   8    | num_1        | allocato da chiamante
+;        |              |
+;  10    | num_2        | allocato da chiamante
+;        |              |
+; ----------------------------------------------
+; dimensione stack frame: 14
+
+risultato: equ 4
+num_1: equ 8
+num_2: equ 10
+
+somma:
+    move.w num_1(sp), d1 ; d1 = num_1
+    move.l num_2(sp), d0 ; d0 = num_2
+    add.l d1, d0         ; d0 = num_2 + num_1
+    move.l d0, risultato(sp) ; salva risultato
+    rts
+```
