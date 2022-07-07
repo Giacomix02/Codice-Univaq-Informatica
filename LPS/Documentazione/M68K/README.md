@@ -582,7 +582,7 @@ bset <Im/Dn/(An)/Ea>, <Dn/(An)/Ea>
 ```
 
 # La memoria in M68K
-La memoria in M68K può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi andrà tenuti in considerazione la lunghezza in byte dei vari formati di dato che andremo a salvare. 
+La memoria in M68K può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi andrà tenuta in considerazione la lunghezza in byte dei vari formati di dato che andremo a salvare. 
 
 
 **ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
