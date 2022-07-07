@@ -282,7 +282,7 @@ mtlo 50
 ```
 
 # Comandi branch e comparazione
-Questi comandi vengono usati per mettere a confronto un registro ad un altro registro, o ad un numero immediato, per poi andare nella label se la condizione è vera.
+Questi comandi vengono usati per mettere a confronto un registro con un altro, o ad un numero immediato, per poi andare nella label se la condizione è vera.
 
 ## Branch incondizionato
 Utilizzato molto nei loop, il branch incondizionato esegue il salto alla label ogni volta.
@@ -452,10 +452,10 @@ rol $s0, $s0, 2
 
 # Input e output (syscall)
 Le syscall ci permettono di comunicare con le api del sistema operativo. Un esempio sono quelle di lettura e scrittura del terminale.
-Il funzionamento generare è quello di inserire il tipo di comando che vogliamo effettuare nel registro `$v0`, ed eseguire la `syscall`.
+Il funzionamento generale è quello di inserire il tipo di comando che vogliamo effettuare nel registro `$v0`, ed eseguire la `syscall`.
 
 ## Input numero intero
-Per effettuare l'input un numero intero (leggere da terminale) si deve settare il registro `$v0` a `5`, effettuare la syscall, e poi leggere il risultato in `$v0`
+Per effettuare l'input di un numero intero (leggere da terminale), si deve settare il registro `$v0` a `5`, effettuare la syscall, e poi leggere il risultato in `$v0`
 
 ```assembly
 li $v0, 5
@@ -464,7 +464,7 @@ move $s1, $v0
 ```
 
 ## Output numero intero
-Per effettuare l'output di un numero intero, si setta il registro di `$v0` a `1`, e il numeri da stampare all'interno del registro `$a0`
+Per effettuare l'output di un numero intero, si setta il registro di `$v0` a `1`, e il numero da stampare all'interno del registro `$a0`
 
 ```assembly
 li $a0, 20
@@ -473,12 +473,12 @@ syscall
     ;stampa 20
 ```
 # La memoria in MIPS
-La memoria in MIPS può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi dovranno essere tenuti in conto la lunghezza in byte dei vari formati di dati che andremo a salvare. 
+La memoria in MIPS può essere vista come una lista di byte, dove ogni byte nella lista ha una posizione chiamata "address". La gestione dei dati salvati all'interno della memoria è completamente lasciata allo sviluppatore che scrive il programma, quindi dovrà essere tenuta in considerazione la lunghezza in byte dei vari formati di dato che andremo a salvare. 
 
 **ATTENZIONE**, quando andiamo a leggere e scrivere negli address, in base alla grandezza del formato che vogliamo usare, l'indirizzo scelto dovrà essere un multiplo del formato scelto. Per esempio, non possiamo salvare una word (4 byte) all'indirizzo 2021, perchè non è modulo di 4, ma possiamo salvarlo in 2024
 
 ## Formati di dato
-Ogni formato di dato ha la propria lunghezza, dovremmo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza`.
+Ogni formato di dato ha la propria lunghezza, dovremo tenerne conto quando salviamo e leggiamo dalla memoria. I dati letti/scritti verranno letti dall'indirizzo specificato, fino all'`indirizzo + lunghezza`.
 
 Alcuni formati standard, diversi dal formato **byte**, definiscono una restrizione agli indirizzi validi per le 
 parole standard di tale formato, chiamata `vincolo di allineamento`.
@@ -486,13 +486,13 @@ parole standard di tale formato, chiamata `vincolo di allineamento`.
 * `word` : ha lunghezza 16 bit (2 parole), fattore di allineamento 2
 * `long` : ha lunghezza 32 bit (4 parole), fattore di allineamento 4
 
-Ad esempio, per salvare una **word** all'address 0x2000, il dato verrà salvato agli indirizzi 0x2000 e 0x2001 e, dunque, la successiva **word**, non potrà essere salvata a partire dall'address 0x2001 ma bensì dovrà essere salvata a partire dall'address 0x2002.
+Ad esempio, per salvare una **word** all'address 0x2000, il dato verrà salvato negli indirizzi 0x2000 e 0x2001 e, dunque, la successiva **word**, non potrà essere salvata a partire dall'address 0x2001, bensì dovrà essere salvata a partire dall'address 0x2002.
 
-Importante è sapere il modo in cui la memoria viene letta/scritta. 
+Importante è sapere il modo in cui i dati in memoria vengono letti/scritti. 
 
 Esistono due tipologie chiamate `little endian` e `big endian`. 
 
-In MIPS, per la lettura/scrittura im memoria può essere usato sia il [Big endian](#Big-endian) che il [Little endian](#little-endian).
+In MIPS, per la lettura/scrittura in memoria può essere usato sia il [Big endian](#Big-endian) che il [Little endian](#little-endian).
 
 MIPS32-MARS utilizza il [Little endian](#little-endian).
 
@@ -503,10 +503,10 @@ Little endian è quando i byte sono salvati da destra verso sinistra, partendo d
 Big endian è quando i byte sono salvati da sinistra verso destra, partendo dal più significativo. Per esempio il numero `0x1234` viene salvato in memoria come `0x12 0x34`.
 
 ## Utilizzo della memoria
-Per utilizzare la memoria all'interno del programma, ci basterà specificare il numero dell'indirizzo della memoria come operando, scrivendolo in maniera `$numero_indirizzo`, esempio `$2000`. Alternativamente, possiamo creare una `variabile` alias all'inizio del programma che indica a quale indirizzo fa riferimento l' alias. Facciamo ciò tramite il comando [.eqv](#.eqv)
+Per utilizzare la memoria all'interno del programma, ci basterà specificare il numero dell'indirizzo della memoria come operando, scrivendolo in maniera `$numero_indirizzo`, esempio `$2000`. Alternativamente, possiamo creare una `variabile` alias all'inizio del programma che indica a quale indirizzo fa riferimento l'alias. Facciamo ciò tramite il comando [.eqv](#.eqv)
 
 
-Su MIPS la memoria viene gestita principalmente dai comandi [lw-lh-lb](#Trasferimento-da-registro-a-memoria) e [sw-sh-sb](#Trasferimento-da-memoria-a-registro), rispettivamente per salvare in e caricare dalla memoria;
+In MIPS la memoria viene gestita principalmente dai comandi [lw-lh-lb](#Trasferimento-da-registro-a-memoria) e [sw-sh-sb](#Trasferimento-da-memoria-a-registro), rispettivamente per salvare in e caricare dalla memoria;
 
 ## .eqv
 *equal variable* -> Crea un alias dell'indirizzo della memoria. 
@@ -599,7 +599,7 @@ la $s0, unaLabel
 
 # Indirizzi di Memoria e Label
 Gli indirizzi possono essere scritti in forme più comode utilizzando `label`. 
-Ogni label è legata ad un indirizzo di memoria, ovvero rappresenta tale indirizzo. In fase di traduzione l'assembler trasforma ogni label nell'indirizzo ad essa legato. Ha quindi senso operazioni come
+Ogni label è legata ad un indirizzo di memoria, ovvero rappresenta tale indirizzo. In fase di traduzione l'assembler trasforma ogni label nell'indirizzo ad essa legato. Hanno quindi senso operazioni come
 
 ```assembly
 ; se pippo è una label, l'indirizzo successivo sarà l'indirizzo pippo+1, quello dopo ancora pippo+2, e così via...
@@ -665,7 +665,7 @@ Per esempio per definire un array di 5 elementi tutti a valore 1:
     .data   $10010000
 unArray:    .byte   1,1,1,1,1
 ```
-Potremmo poi accedere ai valori dell'array usando il nome della label. Se vogliamo iterare gli elementi dell'array, dovremmo leggere l'indirizzo dell'array, e poi incrementarlo in base alla grandezza degli elementi. Oppure se dobbiamo leggere un elemento specifico, possiamo usare `label+posizione`
+Potremo poi accedere ai valori dell'array usando il nome della label. Se volessimo iterare gli elementi dell'array, dovremo leggere l'indirizzo dell'array, e poi incrementarlo in base alla grandezza degli elementi. Oppure se dobbiamo leggere un elemento specifico, possiamo usare `label+posizione`
 ```assembly
 ; STATICO
     .data   $10010000
