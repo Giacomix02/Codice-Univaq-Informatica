@@ -1,5 +1,5 @@
 # Cosa posso trovare?
-Troverete tutte le esercitazioni fatte durante il laboratorio di informatica suddivise per giorno di esercitazione
+Troverete tutte le esercitazioni fatte durante il laboratorio di informatica suddivise per giorno di esercitazione. Inoltre nella sezione Wiki sono presenti gli appunti per la materia LPS del secondo semestre primo anno
 
 # Regole per contribuire
 Se vuoi aggiungere un esercizio, mettilo all'interno della cartella corretta, ogni esercizio deve essere parte di 
