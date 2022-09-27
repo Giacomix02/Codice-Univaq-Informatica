@@ -1,4 +1,4 @@
-#ATTENZIONE
+# ATTENZIONE
 Potete trovare una versione più aggiornata e ben suddivisa a questo indirizzo: https://github.com/UnivaqStudentHub
 
 # Cosa posso trovare?
