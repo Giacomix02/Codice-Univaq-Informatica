@@ -15,6 +15,6 @@ Per i nomi delle cartelle contenenti gli esercizi fatti in CLASSE/LABORATORIO, s
 
 Per i nomi delle cartelle contenenti gli esercizi fatti come COMPITO PER CASA, scrivere: "gg.mm.aa_compito", ai file contenenti le cartelle date un nome breve ma capibile. Per gg/mm/aa si intende la data di assegnamento del compito
 
-## **non garantisco la correttezza degli esercizi**
+## **non garantiamo la correttezza degli esercizi**
 
 
